@@ -52,10 +52,34 @@ TIPS = [
 ]
 
 
+# Pictures from the game for each section (files in sctracker/static/tips)
+PICTURES = {
+    "Before you scan": [
+        ("backpack.jpg", "A bright backpack behind the tooltip makes it hard to read"),
+        ("graphics.jpg", "Graphics settings: Chromatic Aberration 0, Film Grain off, QR code on"),
+    ],
+    "Starting a scan": [
+        ("kiosk.jpg", "The storage kiosk: Stack, category filters, the tooltip and the page number"),
+        ("filters.jpg", "Filtering by a whole category"),
+    ],
+    "Scanning quickly": [
+        ("locked.jpg", "Locked (expired) items"),
+    ],
+    "At shops": [
+        ("shop.jpg", "A shop terminal"),
+    ],
+    "Getting the exact total": [
+        ("freight.jpg", "The freight elevator terminal"),
+    ],
+}
+
+
 def as_markdown():
     out = []
     for head, items in TIPS:
         out.append(f"### {head}\n")
         out += [f"- {t}" for t in items]
         out.append("")
+        for f, alt in PICTURES.get(head, []):
+            out.append(f'<img src="sctracker/static/tips/{f}" width="640" alt="{alt}">\n')
     return "\n".join(out)

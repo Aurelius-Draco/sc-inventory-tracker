@@ -50,6 +50,8 @@ def start_server(app, open_browser=False):
                 html = (STATIC / "index.html").read_text(encoding="utf-8")
                 html = html.replace("__TOKEN__", token).replace("__VERSION__", VERSION)
                 return self._send(200, html.encode("utf-8"), "text/html")
+            if re.fullmatch(r"/tips/[a-z0-9-]+\.jpg", path) and (STATIC / path.lstrip("/")).is_file():
+                return self._send(200, (STATIC / path.lstrip("/")).read_bytes(), "image/jpeg")
             if path == "/favicon.ico":
                 return self._send(200, (STATIC.parent / "assets" / "dashboard.ico").read_bytes(), "image/x-icon")
             if self.headers.get("X-Token") != token:
@@ -79,8 +81,10 @@ def start_server(app, open_browser=False):
             if path == "/api/options":
                 return self._send(200, options(app, qs.get("type"), qs.get("size")))
             if path == "/api/tips":
-                from .tips import TIPS
-                return self._send(200, [{"head": h, "items": i} for h, i in TIPS])
+                from .tips import PICTURES, TIPS
+                return self._send(200, [{"head": h, "items": i,
+                                         "pictures": [{"src": f"/tips/{f}", "alt": a} for f, a in PICTURES.get(h, [])]}
+                                        for h, i in TIPS])
             return self._send(404, {"error": "not found"})
 
         def do_POST(self):

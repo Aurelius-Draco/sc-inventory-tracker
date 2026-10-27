@@ -116,6 +116,10 @@ tracker.py --help
 - Graphics: set Chromatic Aberration to 0 and turn Film Grain off. Keep "Session Information QR Code" on, it lets the tracker date screenshots.
 - Turn the overlay off in Settings if your game stutters while the tracker runs. Clicks and chimes still work.
 
+<img src="sctracker/static/tips/backpack.jpg" width="640" alt="A bright backpack behind the tooltip makes it hard to read">
+
+<img src="sctracker/static/tips/graphics.jpg" width="640" alt="Graphics settings: Chromatic Aberration 0, Film Grain off, QR code on">
+
 ### Starting a scan
 
 - Open the storage kiosk, then press its Stack button. That starts a fresh scan (you'll hear a chime).
@@ -123,6 +127,10 @@ tracker.py --help
 - Check the list looks complete before you start. The kiosk sometimes leaves items out (crates are the usual ones). If something you know you have is missing, press Stack again or close and reopen the kiosk.
 - Keep the right panel on your station's storage (LOCAL). Don't change the sort order mid-scan.
 - Only after some of your things? Switch on one or more category filters (Armor, Weapons, Vehicles and so on) before you press Stack. The tracker sees which are on, scans just those, and slots the result into your last full scan. Use a whole category (All Categories in its menu), not part of one. Changing a filter mid-scan starts a fresh scan of the new selection.
+
+<img src="sctracker/static/tips/kiosk.jpg" width="640" alt="The storage kiosk: Stack, category filters, the tooltip and the page number">
+
+<img src="sctracker/static/tips/filters.jpg" width="640" alt="Filtering by a whole category">
 
 ### Scanning quickly
 
@@ -133,13 +141,19 @@ tracker.py --help
 - If a name comes out cut off, the tooltip was still appearing. Hold still a moment longer; the tracker has another look by itself. Press Insert to force a capture.
 - Don't move items in or out, stack, or use the freight elevator while scanning. The list changes and the scan starts again.
 
+<img src="sctracker/static/tips/locked.jpg" width="640" alt="Locked (expired) items">
+
 ### At shops
 
 - At a shop terminal, press Insert and the overlay labels every item on screen that you already have in storage, with how many and where. Set it to automatic in Settings if you don't mind the extra CPU.
 
+<img src="sctracker/static/tips/shop.jpg" width="640" alt="A shop terminal">
+
 ### Getting the exact total
 
 - Open the freight elevator terminal, clear any filter or search, and scroll its list to the very bottom. The game logs the exact item count and the tracker uses it to confirm the scan is complete.
+
+<img src="sctracker/static/tips/freight.jpg" width="640" alt="The freight elevator terminal">
 
 ### Between scans
 

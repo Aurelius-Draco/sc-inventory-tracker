@@ -453,6 +453,11 @@ dl.kv dt { color: var(--muted); } dl.kv dd { margin: 0; overflow-wrap: anywhere;
 .card ul { margin: 0; padding-left: var(--s4); }
 .card li { margin: var(--s2) 0; line-height: 1.5; }
 .card li::marker { color: var(--line2); }
+.tipfig { margin: var(--s4) 0 0; }
+.tipfig a { display: block; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; background: #000; }
+.tipfig a:hover, .tipfig a:focus-visible { border-color: var(--line2); }
+.tipfig img { display: block; width: 100%; height: auto; }
+.tipfig figcaption { margin-top: var(--s2); color: var(--muted); font-size: .8125rem; }
 .linkl { list-style: none; padding: 0 !important; }
 .linkl li { padding: var(--s2) 0; border-bottom: 1px solid var(--line); margin: 0 !important; }
 .linkl li:last-child { border-bottom: 0; }
@@ -993,7 +998,8 @@ function renderChanges() {
 async function renderTips(tok) {
   S.tips ||= await api("/api/tips"); if (tok !== S.viewTok) return;
   $("view").innerHTML = `<p class="intro">How to get clean, complete scans. Worth a read before your first one.</p><div class="cards">${S.tips.map((t, k) =>
-    `<section class="frame card"><h3><span class="idx">${String(k + 1).padStart(2, "0")}</span>${esc(t.head)}</h3><ul>${t.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul></section>`).join("")}</div>`;
+    `<section class="frame card"><h3><span class="idx">${String(k + 1).padStart(2, "0")}</span>${esc(t.head)}</h3><ul>${t.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>${(t.pictures || []).map(p =>
+      `<figure class="tipfig"><a href="${esc(p.src)}" target="_blank" rel="noopener" title="Open full size"><img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy"></a><figcaption>${esc(p.alt)}</figcaption></figure>`).join("")}</section>`).join("")}</div>`;
 }
 async function renderLinks(tok) {
   S.links ||= await api("/api/links"); if (tok !== S.viewTok) return;
