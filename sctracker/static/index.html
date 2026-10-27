@@ -475,20 +475,44 @@ dl.kv dt { color: var(--muted); } dl.kv dd { margin: 0; overflow-wrap: anywhere;
 .switch:checked { background: var(--amber); } .switch:checked::after { left: calc(100% - .875rem - 3px); background: var(--on-amber); }
 .switch:focus { outline: none; } .switch:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 .savebar { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); align-items: center; padding-top: var(--s3); border-top: 1px solid var(--line); }
-.about { max-width: 72ch; margin-top: var(--s4); padding: var(--s5) var(--s6); }
-.about h3 { margin: var(--s6) 0 var(--s2); font-size: 1rem; } .about h3:first-child { margin-top: 0; }
-.about .lead { font-size: 1.125rem; color: var(--text); }
-.about ul { padding-left: var(--s5); } .about li { margin: var(--s2) 0; }
-.about .who { display: flex; gap: var(--s5); align-items: flex-start; }
-.about .portrait { flex: none; width: 120px; height: 120px; object-fit: cover; border: 1px solid var(--line2); border-radius: 4px; }
-.about ul.alinks { list-style: none; padding: 0; margin: var(--s5) 0 0; border-top: 1px solid var(--line); }
-.about ul.alinks li { margin: 0; padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
-.about ul.shipwish { list-style: none; padding: 0; margin: var(--s3) 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: var(--s2); }
-.about ul.shipwish li { margin: 0; padding: var(--s3); border: 1px solid var(--line); border-radius: 4px; display: grid; gap: 2px; align-content: start; }
-.about ul.shipwish a { font-weight: 700; }
-.about ul.shipwish .mk { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; }
-.about ul.shipwish .why { font-size: .875rem; }
-@media (max-width: 520px) { .about .who { flex-direction: column; } }
+/* About */
+.ahero { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s7); align-items: start; margin-top: var(--s4); padding: var(--s6) var(--s7); border-top: 2px solid var(--amber); overflow: hidden; }
+.ahero::after { content: ""; position: absolute; right: -120px; top: -160px; width: 420px; height: 420px; border-radius: 50%; border: 1px solid var(--line); box-shadow: 0 0 0 40px var(--panel), 0 0 0 41px var(--line); pointer-events: none; opacity: .7; }
+.aport { position: relative; padding: 6px; justify-self: start; width: max-content; }
+.aport::before, .aport::after { content: ""; position: absolute; width: 22px; height: 22px; border: 2px solid var(--amber); }
+.aport::before { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.aport::after { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+.aport img { display: block; width: 200px; height: 200px; object-fit: cover; border-radius: 3px; border: 1px solid var(--line2); }
+.abody { position: relative; z-index: 1; min-width: 0; }
+.abody h2 { margin: 2px 0 var(--s3); font-size: 2.5rem; line-height: 1; font-weight: 700; font-stretch: condensed; letter-spacing: .01em; overflow-wrap: anywhere; }
+.abody .amsg { margin: 0 0 var(--s2); max-width: 70ch; color: var(--muted); }
+.abody .lead { margin: var(--s3) 0 0; max-width: 60ch; font-size: 1.1875rem; line-height: 1.45; color: var(--text); border-left: 2px solid var(--amber); padding-left: var(--s4); }
+.atiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: var(--s3); margin-top: var(--s6); }
+.atile, .ltile, .wcard { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; justify-items: start; gap: 3px; padding: var(--s4); border: 1px solid var(--line); border-radius: 4px; background: var(--raise); color: var(--text); text-decoration: none; transition: border-color .15s, background-color .15s, transform .15s; }
+.atile:hover, .ltile:hover, .wcard:hover, .atile:focus-visible, .ltile:focus-visible, .wcard:focus-visible { border-color: var(--teal); background: var(--raise2); }
+@media (prefers-reduced-motion: no-preference) { .atile:hover, .ltile:hover, .wcard:hover { transform: translateY(-1px); } }
+.aico { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: var(--s2); border-radius: 4px; border: 1px solid var(--teal-bg); background: var(--teal-bg); color: var(--teal); }
+.at { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ax { font-weight: 700; font-size: 1rem; overflow-wrap: anywhere; }
+.ad, .ldesc { font-size: .8125rem; color: var(--muted); line-height: 1.45; }
+.agrid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--s4); margin-top: var(--s4); align-items: start; }
+.apanel { padding: var(--s5) var(--s6); }
+.apanel > h3, .lgh { display: flex; align-items: center; gap: var(--s2); margin: 0 0 var(--s2); font-size: 1rem; }
+.lghi { display: inline-grid; color: var(--amber); }
+.shipwish { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: var(--s3); margin-top: var(--s4); }
+.wc-mk { font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.wc-n { font-weight: 700; font-size: 1.0625rem; color: var(--teal); display: inline-flex; gap: 6px; align-items: center; }
+.wc-why { font-size: .875rem; color: var(--text); }
+ul.rules { list-style: none; padding: 0; margin: var(--s3) 0 var(--s4); }
+ul.rules li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: var(--s3); margin: 0; padding: var(--s3) 0; border-bottom: 1px solid var(--line); font-size: .9375rem; line-height: 1.5; }
+ul.rules li svg { margin-top: 3px; color: var(--teal); }
+@media (max-width: 1000px) { .agrid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .ahero { grid-template-columns: 1fr; gap: var(--s4); padding: var(--s5); } .aport img { width: 140px; height: 140px; } .abody h2 { font-size: 2rem; } .ahero::after { display: none; } }
+/* Links */
+.lgroup { margin-top: var(--s5); }
+.ltiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: var(--s3); margin-top: var(--s3); }
+.lname { display: inline-flex; gap: 6px; align-items: center; font-weight: 700; font-size: 1.0625rem; color: var(--teal); }
+.lhost { font: .75rem var(--mono); color: var(--muted); margin-bottom: 2px; }
 
 /* Toast */
 .toast { position: fixed; left: 50%; bottom: var(--s6); z-index: 50; max-width: min(35rem, calc(100vw - 2rem)); padding: var(--s2) var(--s4); border: 1px solid var(--line2); border-left: 2px solid var(--teal); border-radius: var(--r-sm); background: var(--raise2); color: var(--text); box-shadow: var(--shadow);
@@ -1011,27 +1035,57 @@ async function renderTips(tok) {
     `<section class="frame card"><h3><span class="idx">${String(k + 1).padStart(2, "0")}</span>${esc(t.head)}</h3><ul>${t.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>${(t.pictures || []).map(p =>
       `<figure class="tipfig"><a href="${esc(p.src)}" target="_blank" rel="noopener" title="Open full size"><img src="${esc(p.src)}" alt="${esc(p.alt)}" loading="lazy"></a><figcaption>${esc(p.alt)}</figcaption></figure>`).join("")}</section>`).join("")}</div>`;
 }
+const GLYPH = {
+  citizen: `<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.2"/><path d="M5.5 16.5c.8-1.7 2-2.5 3.5-2.5s2.7.8 3.5 2.5M14.5 10h4M14.5 13.5h4"/>`,
+  gift: `<rect x="3" y="8" width="18" height="5" rx="1"/><path d="M5 13v7h14v-7M12 8v12M12 8C10.5 5 7 4.5 7 6.8 7 8 9.5 8 12 8zm0 0c1.5-3 5-3.5 5-1.2C17 8 14.5 8 12 8z"/>`,
+  code: `<path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"/>`,
+  ship: `<path d="M12 2.5l2.6 6.5 6.4 3.5v2l-6.3-1.2-.9 4.6 2.7 1.9v1.7L12 20.3l-4.5 1.2v-1.7l2.7-1.9-.9-4.6L3 14.5v-2L9.4 9z"/>`,
+  wrench: `<path d="M14.5 6.5a4 4 0 0 0-5.3 5.2l-5.7 5.7a1.6 1.6 0 0 0 2.3 2.3l5.7-5.7a4 4 0 0 0 5.2-5.3l-2.6 2.6-2.3-.5-.5-2.3z"/>`,
+  gauge: `<path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 18l4-6M4 18h3M17 18h3"/>`,
+  shield: `<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>`,
+  chart: `<path d="M3 20h18M5 16l4-5 4 3 6-8"/><path d="M15 6h4v4"/>`,
+  route: `<circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/>`,
+  crate: `<rect x="3" y="6" width="18" height="13" rx="1"/><path d="M3 10h18M8 6v13M16 6v13"/>`,
+  search: `<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/>`,
+  scroll: `<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>`,
+  data: `<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/>`,
+  pin: `<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.5"/>`,
+  cube: `<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/>`,
+  book: `<path d="M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3zM21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z"/>`,
+  planet: `<circle cx="12" cy="12" r="5.5"/><path d="M6.3 14.6C3.6 16.5 2.6 18.2 3.3 19c1.2 1.4 6.7-.6 12.3-4.6S22 6.4 20.7 5c-.6-.7-2.1-.5-4.1.4"/>`,
+  link: `<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>`,
+};
+const glyph = (k, s = 22) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${GLYPH[k] || GLYPH.link}</svg>`;
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } };
+const NEWTAB = `<span class="sr"> (opens in a new tab)</span>`;
+
 async function renderLinks(tok) {
   S.links ||= await api("/api/links"); if (tok !== S.viewTok) return;
-  $("view").innerHTML = `<p class="intro">Community sites players use alongside the tracker. They open in your browser.</p><div class="cards">${S.links.map(g =>
-    `<section class="frame card"><h3>${esc(g.head)}</h3><ul class="linkl">${g.items.map(l =>
-      `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ${ICON.ext}<span class="sr">(opens in a new tab)</span></a><div class="sub">${esc(l.about)}</div></li>`).join("")}</ul></section>`).join("")}</div>
-    <p class="sub" style="margin-top:16px">Know a good one that's missing? Suggest it on the project's GitHub page.</p>`;
+  $("view").innerHTML = `<p class="intro">Community sites players use alongside the tracker. They open in your browser.</p>${S.links.map(g =>
+    `<section class="lgroup"><h3 class="lgh"><span class="lghi">${glyph(g.icon, 18)}</span>${esc(g.head)}</h3><div class="ltiles">${g.items.map(l =>
+      `<a class="ltile" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="aico">${glyph(l.icon)}</span><span class="lname">${esc(l.name)} ${ICON.ext}</span><span class="lhost">${esc(hostOf(l.url))}</span><span class="ldesc">${esc(l.about)}</span>${NEWTAB}</a>`).join("")}</div></section>`).join("")}
+    <p class="sub" style="margin-top:var(--s5)">Know a good one that's missing? Suggest it on the project's GitHub page.</p>`;
 }
 async function renderAbout(tok) {
   S.about ||= await api("/api/about"); if (tok !== S.viewTok) return;
   const a = S.about, au = a.author;
-  $("view").innerHTML = `<div class="frame about">
-    <div class="who">${au.picture ? `<img class="portrait" src="${esc(au.picture)}" alt="${esc(au.name)}'s character" width="120" height="120">` : ""}<div>
-    <h3>Made by ${esc(au.name)}${au.handle ? `, in game as ${esc(au.handle)}` : ""}</h3>
-    ${a.message.map((m, k) => `<p class="${k === a.message.length - 1 ? "lead" : ""}">${esc(m)}</p>`).join("")}
-    ${au.org ? `<p>Org: ${esc(au.org)}</p>` : ""}</div></div>
-    <ul class="alinks">${(a.links || []).map(l => `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ${ICON.ext}<span class="sr">(opens in a new tab)</span></a><div class="sub">${esc(l.about)}</div></li>`).join("")}
-    ${au.repo ? `<li><a href="${esc(au.repo)}" target="_blank" rel="noopener">Project page, updates and issues ${ICON.ext}<span class="sr">(opens in a new tab)</span></a><div class="sub">Download the latest version, report a bug or suggest an idea.</div></li>` : ""}</ul>
-    ${(a.wishlist || []).length ? `<h3>Ships on my wish list</h3><p class="sub">${esc(a.wish_intro || "")}</p>
-    <ul class="shipwish">${a.wishlist.map(w => `<li><a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.name)} ${ICON.ext}<span class="sr">(opens the RSI store in a new tab)</span></a><span class="mk">${esc(w.maker)}</span><span class="why">${esc(w.why)}</span></li>`).join("")}</ul>` : ""}
-    <h3>How it treats your game and your data</h3><ul>${a.rules.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
-    <p class="sub">SC Inventory Tracker ${esc(a.version)}</p></div>`;
+  const tiles = [...(a.links || [])];
+  if (au.repo) tiles.push({ icon: "code", title: "Project page", text: "SC Inventory Tracker on GitHub", url: au.repo, about: "Updates, bug reports and ideas." });
+  const last = a.message.length - 1;
+  $("view").innerHTML = `<section class="frame ahero">
+    ${au.picture ? `<div class="aport"><img src="${esc(au.picture)}" alt="${esc(au.name)}'s character" width="200" height="200"></div>` : ""}
+    <div class="abody"><p class="eyebrow">Made by</p><h2>${esc(au.handle || au.name)}</h2>
+      ${a.message.map((m, k) => `<p class="${k === last ? "lead" : "amsg"}">${esc(m)}</p>`).join("")}
+      ${au.org ? `<p class="amsg">Org: ${esc(au.org)}</p>` : ""}
+      <div class="atiles">${tiles.map(t => `<a class="atile" href="${esc(t.url)}" target="_blank" rel="noopener"><span class="aico">${glyph(t.icon)}</span><span class="at">${esc(t.title)}</span><span class="ax">${esc(t.text)}</span><span class="ad">${esc(t.about)}</span>${NEWTAB}</a>`).join("")}</div>
+    </div></section>
+  <div class="agrid">
+    ${(a.wishlist || []).length ? `<section class="frame apanel"><h3><span class="lghi">${glyph("ship", 18)}</span>Ships on my wish list</h3><p class="sub">${esc(a.wish_intro || "")}</p>
+      <div class="shipwish">${a.wishlist.map(w => `<a class="wcard" href="${esc(w.url)}" target="_blank" rel="noopener"><span class="wc-mk">${esc(w.maker)}</span><span class="wc-n">${esc(w.name)} ${ICON.ext}</span><span class="wc-why">${esc(w.why)}</span><span class="sr"> (opens the RSI store in a new tab)</span></a>`).join("")}</div></section>` : ""}
+    <section class="frame apanel"><h3><span class="lghi">${glyph("shield", 18)}</span>How it treats your game and your data</h3>
+      <ul class="rules">${a.rules.map(r => `<li>${ICON.check}<span>${esc(r)}</span></li>`).join("")}</ul>
+      <p class="sub">SC Inventory Tracker ${esc(a.version)}</p></section>
+  </div>`;
 }
 
 /* ---------- settings ---------- */

@@ -8,13 +8,14 @@ AUTHOR = {
     "picture": "aurelius-draco.jpg",   # in sctracker/static/img
 }
 
-# Shown on the About tab and in the README: (link text, address, note)
+# Shown on the About tab (as tiles) and in the README
 LINKS = [
-    ("My citizen page on RSI", "https://robertsspaceindustries.com/en/citizens/Aurelius_Draco",
-     "Add me as a friend or send me a message in game."),
-    ("New to Star Citizen? Sign up with my referral code STAR-VD9W-346V",
-     "https://www.robertsspaceindustries.com/enlist?referral=STAR-VD9W-346V",
-     "New players get 50,000 UEC to start with when they sign up with a referral code."),
+    {"icon": "citizen", "title": "Citizen page", "text": "Aurelius_Draco on RSI",
+     "url": "https://robertsspaceindustries.com/en/citizens/Aurelius_Draco",
+     "about": "Add me as a friend or send me a message in game."},
+    {"icon": "gift", "title": "New to Star Citizen?", "text": "Referral code STAR-VD9W-346V",
+     "url": "https://www.robertsspaceindustries.com/enlist?referral=STAR-VD9W-346V",
+     "about": "Sign up with it and you start with 50,000 UEC."},
 ]
 
 # Ships on my wish list: (ship, maker, RSI store page, why)

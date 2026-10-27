@@ -235,8 +235,8 @@ I built this to keep track of what I'd left at stations around the verse, and it
 The only thing I ask in return: if you see me in game or in chat, say hi, and if you're running team gameplay, invite me along.
 <br clear="left">
 
-- [My citizen page on RSI](https://robertsspaceindustries.com/en/citizens/Aurelius_Draco). Add me as a friend or send me a message in game.
-- [New to Star Citizen? Sign up with my referral code STAR-VD9W-346V](https://www.robertsspaceindustries.com/enlist?referral=STAR-VD9W-346V). New players get 50,000 UEC to start with when they sign up with a referral code.
+- **Citizen page** [Aurelius_Draco on RSI](https://robertsspaceindustries.com/en/citizens/Aurelius_Draco). Add me as a friend or send me a message in game.
+- **New to Star Citizen?** [Referral code STAR-VD9W-346V](https://www.robertsspaceindustries.com/enlist?referral=STAR-VD9W-346V). Sign up with it and you start with 50,000 UEC.
 
 ### Ships on my wish list
 

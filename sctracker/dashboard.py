@@ -62,14 +62,15 @@ def start_server(app, open_browser=False):
                 return self._send(200, {k: app.cfg.get(k) for k in SETTINGS})
             if path == "/api/links":
                 from .links import LINKS
-                return self._send(200, [{"head": h, "items": [dict(name=n, url=u, about=d) for n, u, d in i]}
-                                        for h, i in LINKS])
+                return self._send(200, [{"head": h, "icon": ic, "items": [dict(name=n, url=u, about=d, icon=c)
+                                                                    for n, u, d, c in i]}
+                                        for h, ic, i in LINKS])
             if path == "/api/about":
                 from . import about
                 au = dict(about.AUTHOR)
                 au["picture"] = f"/img/{au['picture']}" if au.get("picture") else ""
                 return self._send(200, {"author": au, "message": about.MESSAGE, "rules": about.RULES,
-                                        "links": [dict(name=n, url=u, about=d) for n, u, d in about.LINKS],
+                                        "links": about.LINKS,
                                         "wish_intro": about.WISHLIST_INTRO,
                                         "wishlist": [dict(name=n, maker=m, url=u, why=w) for n, m, u, w in about.WISHLIST],
                                         "version": VERSION})

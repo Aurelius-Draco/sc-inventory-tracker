@@ -12,7 +12,7 @@ who = f"Made by {au['name']}" + (f", in game as **{au['handle']}**" if au["handl
 pic = (f'<img src="sctracker/static/img/{au["picture"]}" width="120" align="left" alt="">\n\n'
        if au.get("picture") else "")
 about_md = pic + who + "\n\n" + "\n\n".join(about.MESSAGE) + '\n<br clear="left">\n\n' + "\n".join(
-    f"- [{n}]({u}). {d}" for n, u, d in about.LINKS)
+    f"- **{l['title']}** [{l['text']}]({l['url']}). {l['about']}" for l in about.LINKS)
 about_md += "\n\n### Ships on my wish list\n\n" + about.WISHLIST_INTRO + "\n\n" + "\n".join(
     f"- [{n}]({u}) ({m}). {w}" for n, m, u, w in about.WISHLIST)
 t = t.replace("{RULES}", "\n".join(f"- {r}" for r in about.RULES))
