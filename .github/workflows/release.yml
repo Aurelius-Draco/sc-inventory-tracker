@@ -1,11 +1,11 @@
 name: release
-# Publish a release on GitHub (or push a tag like v3.0) and this builds the
-# download zip, attaches it, and fills in the notes from CHANGELOG.md.
+# Publish a release on GitHub (Releases, Draft a new release, new tag like v3.1)
+# and this builds the download zip, attaches it, and fills in the notes from
+# CHANGELOG.md. Only the release event triggers it: publishing on the website
+# also creates the tag, and two runs at once would race to upload the zip.
 on:
   release:
     types: [published]
-  push:
-    tags: ["v*"]
 permissions:
   contents: write
 jobs:
