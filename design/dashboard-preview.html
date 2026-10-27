@@ -173,7 +173,7 @@ kbd { font: 600 .75rem var(--mono); border: 1px solid var(--line2); border-botto
 /* Tabs: opaque, sticky, one underline for the active one */
 .tabbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: stretch; gap: 0; height: 3rem; margin: var(--s6) calc(-1 * var(--s7)) 0; padding: 0 calc(var(--s7) - var(--s3)); overflow-x: auto; scrollbar-width: none; background: var(--bg); border-bottom: 1px solid var(--line); }
 .tabbar::-webkit-scrollbar { display: none; }
-.tabbar button { position: relative; flex: none; display: flex; align-items: center; gap: var(--s2); padding: 0 var(--s3); background: none; border: 0; color: var(--muted); font-size: .8125rem; font-weight: 600; white-space: nowrap; }
+.tabbar button { position: relative; flex: none; display: flex; align-items: center; gap: var(--s2); padding: 0 var(--s3); background: none; border: 0; color: var(--muted); font-size: .9375rem; font-weight: 700; white-space: nowrap; }
 .tabbar button:hover { color: var(--text); }
 .tabbar button[aria-selected="true"] { color: var(--text); }
 .tabbar button[aria-selected="true"]::after { content: ""; position: absolute; left: var(--s3); right: var(--s3); bottom: -1px; height: 2px; background: var(--amber); }
@@ -479,6 +479,11 @@ dl.kv dt { color: var(--muted); } dl.kv dd { margin: 0; overflow-wrap: anywhere;
 .about h3 { margin: var(--s6) 0 var(--s2); font-size: 1rem; } .about h3:first-child { margin-top: 0; }
 .about .lead { font-size: 1.125rem; color: var(--text); }
 .about ul { padding-left: var(--s5); } .about li { margin: var(--s2) 0; }
+.about .who { display: flex; gap: var(--s5); align-items: flex-start; }
+.about .portrait { flex: none; width: 120px; height: 120px; object-fit: cover; border: 1px solid var(--line2); border-radius: 4px; }
+.about ul.alinks { list-style: none; padding: 0; margin: var(--s5) 0 0; border-top: 1px solid var(--line); }
+.about ul.alinks li { margin: 0; padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+@media (max-width: 520px) { .about .who { flex-direction: column; } }
 
 /* Toast */
 .toast { position: fixed; left: 50%; bottom: var(--s6); z-index: 50; max-width: min(35rem, calc(100vw - 2rem)); padding: var(--s2) var(--s4); border: 1px solid var(--line2); border-left: 2px solid var(--teal); border-radius: var(--r-sm); background: var(--raise2); color: var(--text); box-shadow: var(--shadow);
@@ -1079,10 +1084,12 @@ async function renderAbout(tok) {
   S.about ||= await api("/api/about"); if (tok !== S.viewTok) return;
   const a = S.about, au = a.author;
   $("view").innerHTML = `<div class="frame about">
+    <div class="who">${au.picture ? `<img class="portrait" src="${esc(au.picture)}" alt="${esc(au.name)}'s character" width="120" height="120">` : ""}<div>
     <h3>Made by ${esc(au.name)}${au.handle ? `, in game as ${esc(au.handle)}` : ""}</h3>
     ${a.message.map((m, k) => `<p class="${k === a.message.length - 1 ? "lead" : ""}">${esc(m)}</p>`).join("")}
-    ${au.org ? `<p>Org: ${esc(au.org)}</p>` : ""}
-    ${au.repo ? `<p><a href="${esc(au.repo)}" target="_blank" rel="noopener">Project page, updates and issues ${ICON.ext}</a></p>` : ""}
+    ${au.org ? `<p>Org: ${esc(au.org)}</p>` : ""}</div></div>
+    <ul class="alinks">${(a.links || []).map(l => `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ${ICON.ext}<span class="sr">(opens in a new tab)</span></a><div class="sub">${esc(l.about)}</div></li>`).join("")}
+    ${au.repo ? `<li><a href="${esc(au.repo)}" target="_blank" rel="noopener">Project page, updates and issues ${ICON.ext}<span class="sr">(opens in a new tab)</span></a><div class="sub">Download the latest version, report a bug or suggest an idea.</div></li>` : ""}</ul>
     <h3>How it treats your game and your data</h3><ul>${a.rules.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
     <p class="sub">SC Inventory Tracker ${esc(a.version)}</p></div>`;
 }

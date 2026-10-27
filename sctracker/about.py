@@ -5,7 +5,17 @@ AUTHOR = {
     "handle": "",            # same as name; kept for anyone forking with a different in-game name
     "org": "",
     "repo": "https://github.com/Aurelius-Draco/sc-inventory-tracker",
+    "picture": "aurelius-draco.jpg",   # in sctracker/static/img
 }
+
+# Shown on the About tab and in the README: (link text, address, note)
+LINKS = [
+    ("My citizen page on RSI", "https://robertsspaceindustries.com/en/citizens/Aurelius_Draco",
+     "Add me as a friend or send me a message in game."),
+    ("New to Star Citizen? Sign up with my referral code STAR-VD9W-346V",
+     "https://www.robertsspaceindustries.com/enlist?referral=STAR-VD9W-346V",
+     "New players get bonus UEC when they sign up with a referral code."),
+]
 
 MESSAGE = [
     "I built this to keep track of what I'd left at stations around the verse, and it turned out useful "

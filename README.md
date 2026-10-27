@@ -226,11 +226,17 @@ See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## About
 
+<img src="sctracker/static/img/aurelius-draco.jpg" width="120" align="left" alt="">
+
 Made by Aurelius_Draco.
 
 I built this to keep track of what I'd left at stations around the verse, and it turned out useful enough to share. It's free and always will be.
 
 The only thing I ask in return: if you see me in game or in chat, say hi, and if you're running team gameplay, invite me along.
+<br clear="left">
+
+- [My citizen page on RSI](https://robertsspaceindustries.com/en/citizens/Aurelius_Draco). Add me as a friend or send me a message in game.
+- [New to Star Citizen? Sign up with my referral code STAR-VD9W-346V](https://www.robertsspaceindustries.com/enlist?referral=STAR-VD9W-346V). New players get bonus UEC when they sign up with a referral code.
 
 ## Licence
 
