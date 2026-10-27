@@ -1,4 +1,4 @@
-"""SC Inventory Tracker. Run: python tracker.py  (or run.bat)  --help for options."""
+"""SC Inventory Tracker. Run: python tracker.py  (or the SC Inventory Tracker shortcut)  --help for options."""
 from sctracker.cli import main
 
 if __name__ == "__main__":

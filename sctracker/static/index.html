@@ -1056,7 +1056,7 @@ function renderItems() {
   const m = S.model, exp = S.tab === "expired";
   if (!m.stations.length) {
     $("fcount").textContent = ""; $("fclear").hidden = true;
-    $("view").innerHTML = emptyState("Nothing scanned yet", "Start the tracker with run.bat, open a storage kiosk in game and press its Stack button. Your items show up here as the tracker reads them.", `<button class="btn" type="button" data-go="tips">Read the scanning tips</button>`);
+    $("view").innerHTML = emptyState("Nothing scanned yet", "Start the tracker (the SC Inventory Tracker shortcut), open a storage kiosk in game and press its Stack button. Your items show up here as the tracker reads them.", `<button class="btn" type="button" data-go="tips">Read the scanning tips</button>`);
     return;
   }
   const rows = filtered(), base = filtered(S.station, true).length, active = filtersActive();

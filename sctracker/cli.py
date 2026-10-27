@@ -13,7 +13,7 @@ from .config import DATA, VERSION, load_config, migrate_v2_data, say
 
 HELP = """
 Examples:
-  run.bat                                    live mode, while you play
+  SC Inventory Tracker shortcut               live mode, while you play
   tracker.py --dashboard                     open the dashboard in your browser
   tracker.py --where "Ripper"                which stations hold an item
   tracker.py --adjust "Alpha" "Gold" -40 --note "sold at Levski"

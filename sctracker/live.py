@@ -426,4 +426,4 @@ def calibrate_live(app):
         say(f"Calibration didn't work: {e}")
         return
     save(cal)
-    say("Done. Start run.bat as usual.")
+    say("Done. Start the tracker as usual.")

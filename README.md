@@ -1,4 +1,4 @@
-# SC Inventory Tracker
+# <img src="sctracker/assets/tracker.png" width="40" align="top" alt=""> SC Inventory Tracker
 
 Keeps track of what you've left in station storage around the Star Citizen
 verse. Scan a station's storage kiosk once, and the tracker keeps that station
@@ -70,14 +70,16 @@ reading the kiosk screen isn't supported yet (see the roadmap).
    [Releases](https://github.com/Aurelius-Draco/sc-inventory-tracker/releases)
    (or Code, then Download ZIP) and unzip it anywhere, for example next to
    your StarCitizen folder.
-2. Double-click **setup.bat**. It creates a private Python environment in the
-   folder and downloads the text reader (about 100 MB).
+2. Double-click **Setup.bat**. It creates a private Python environment in the
+   folder, downloads the text reader (about 100 MB) and makes shortcuts with
+   icons. Say Y if you also want them on the desktop and in the Start menu.
+   If you move the folder later, run Setup.bat again to fix the shortcuts.
 3. If your game isn't in a standard place, open `data\config.json` after the
    first run and set `game_dir` to your `StarCitizen\LIVE` folder.
 
 ## Use
 
-**Scanning a station:** start **run.bat**, open the storage kiosk in game and
+**Scanning a station:** start **SC Inventory Tracker**, open the storage kiosk in game and
 press its **Stack** button. That starts a fresh scan. Hover the items, page by
 page. Green dots are done, blue dots were filled in, amber outlines still need
 a hover. A chime means a page is complete. Ctrl+C in the tracker window stops
@@ -86,8 +88,13 @@ it and prints anything still missing.
 **Exact total:** open the freight elevator terminal, clear filters and
 scroll its list to the bottom. The tracker takes the exact count from the log.
 
-**Looking things up:** double-click **dashboard.bat** (or just leave run.bat
-running: the dashboard runs alongside it).
+**Looking things up:** open **SC Inventory Dashboard** (or just leave the
+tracker running: the dashboard runs alongside it).
+
+**Other shortcuts:** *SC Inventory Tracker (no overlay)* skips the on-screen
+markers if your PC is short on power, and *SC Inventory Screenshot Reader*
+reads kiosk screenshots you took in game. The batch files behind every
+shortcut are in the `launchers` folder.
 
 **From the command line** (handy for AI assistants with a shell):
 

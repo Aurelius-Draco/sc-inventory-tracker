@@ -1,6 +1,6 @@
 # Third-party software and data
 
-The tracker installs these with setup.bat. They are not bundled in this repository.
+The tracker installs these with Setup.bat. They are not bundled in this repository.
 
 | package | licence | used for |
 |---|---|---|

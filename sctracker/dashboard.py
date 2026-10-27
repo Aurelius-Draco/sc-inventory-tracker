@@ -50,6 +50,8 @@ def start_server(app, open_browser=False):
                 html = (STATIC / "index.html").read_text(encoding="utf-8")
                 html = html.replace("__TOKEN__", token).replace("__VERSION__", VERSION)
                 return self._send(200, html.encode("utf-8"), "text/html")
+            if path == "/favicon.ico":
+                return self._send(200, (STATIC.parent / "assets" / "dashboard.ico").read_bytes(), "image/x-icon")
             if self.headers.get("X-Token") != token:
                 return self._send(403, {"error": "bad token"})
             if path == "/api/model":

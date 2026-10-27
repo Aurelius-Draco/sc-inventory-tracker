@@ -23,6 +23,9 @@
 - Shop helper: press Insert at a shop terminal and the overlay labels items you already own.
 - Station names are picked from the game's own place names.
 - Data now lives in the `data` folder; v2 data is copied across on first run.
+- Setup makes shortcuts with icons (SC Inventory Tracker, SC Inventory Dashboard and two more), and can add
+  them to the desktop and Start menu. The batch files behind them are in the `launchers` folder.
+- New dashboard look, and a design preview with sample data in the `design` folder.
 
 ## 2.3
 
