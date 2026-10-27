@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storage Manifest</title>
+<style>
+:root {
+  --hull: #1b232d; --panel: #222c37; --raise: #2a3542; --line: #354251;
+  --text: #e4e8ec; --muted: #9aa6b2; --amber: #f0a53a; --teal: #4cb5a8; --rust: #de6f55;
+  --on-amber: #1b232d; --amber-bg: rgba(240,165,58,.12); --teal-bg: rgba(76,181,168,.13); --rust-bg: rgba(222,111,85,.13);
+  --font: "Bahnschrift", "DIN Alternate", "Barlow", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --hull: #e9edf1; --panel: #f8fafb; --raise: #ffffff; --line: #cdd5dd;
+    --text: #18202a; --muted: #56616d; --amber: #a86400; --teal: #1d7a70; --rust: #b0452f;
+    --on-amber: #ffffff; --amber-bg: rgba(168,100,0,.10); --teal-bg: rgba(29,122,112,.10); --rust-bg: rgba(176,69,47,.10);
+  }
+}
+:root[data-theme="light"] {
+  --hull: #e9edf1; --panel: #f8fafb; --raise: #ffffff; --line: #cdd5dd;
+  --text: #18202a; --muted: #56616d; --amber: #a86400; --teal: #1d7a70; --rust: #b0452f;
+  --on-amber: #ffffff; --amber-bg: rgba(168,100,0,.10); --teal-bg: rgba(29,122,112,.10); --rust-bg: rgba(176,69,47,.10);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--hull); color: var(--text); font: 15px/1.45 var(--font); font-variant-numeric: tabular-nums; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+a { color: var(--teal); }
+
+.shell { display: grid; grid-template-columns: 290px 1fr; min-height: 100vh; }
+
+/* Station rail */
+.rail { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 0 40px; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
+.brand { padding: 0 20px 18px; }
+.brand h1 { font-size: 22px; font-weight: 700; font-stretch: condensed; letter-spacing: .02em; margin: 0; }
+.brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.sys { margin-top: 14px; }
+.sys h2 { font-size: 13px; font-weight: 600; color: var(--muted); margin: 0 20px 4px; }
+.st { display: block; width: 100%; text-align: left; background: none; border: 0; border-left: 3px solid transparent; padding: 7px 20px 8px 17px; }
+.st:hover { background: var(--raise); }
+.st[aria-current="true"] { border-left-color: var(--amber); background: var(--raise); }
+.st .n { display: flex; justify-content: space-between; gap: 8px; }
+.st .n b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st .n span { color: var(--muted); }
+.fresh { display: block; height: 3px; background: var(--line); margin-top: 6px; border-radius: 2px; overflow: hidden; }
+.fresh i { display: block; height: 100%; background: var(--teal); }
+.fresh.old i { background: var(--amber); }
+.fresh.none i { width: 0 !important; }
+.st small { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; }
+.st small.warn { color: var(--amber); }
+
+/* Main */
+main { padding: 26px 34px 60px; min-width: 0; }
+.search { display: flex; align-items: stretch; border: 2px solid var(--line); background: var(--raise); border-radius: 4px; }
+.search label { display: flex; align-items: center; padding: 0 14px; background: var(--amber); color: var(--on-amber); font-weight: 700; font-stretch: condensed; font-size: 15px; }
+.search input { flex: 1; border: 0; background: none; padding: 12px 14px; font-size: 26px; font-stretch: semi-condensed; min-width: 0; }
+.search input:focus { outline: none; }
+.search:focus-within { border-color: var(--amber); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 12px 0 0; color: var(--muted); font-size: 14px; }
+.filters select { background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 4px 6px; }
+.filters label { display: inline-flex; gap: 6px; align-items: center; }
+
+.needs { margin: 20px 0 0; border: 1px solid var(--amber); background: var(--amber-bg); border-radius: 4px; padding: 12px 16px; }
+.needs h3 { margin: 0 0 6px; font-size: 16px; color: var(--amber); }
+.need { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
+.need:first-of-type { border-top: 0; }
+.need p { margin: 0; flex: 1 1 340px; }
+.need select, .need input { background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 4px 6px; }
+.need input { width: 80px; }
+
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; align-items: end; margin: 26px 0 6px; }
+.head h2 { font-size: 30px; font-weight: 700; font-stretch: condensed; margin: 0; line-height: 1.1; }
+.head .facts { color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.head .facts b { color: var(--text); font-weight: 600; }
+.head .facts .warn { color: var(--amber); }
+.linkish { background: none; border: 0; color: var(--teal); padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-top: 14px; overflow-x: auto; }
+.tabs button { background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 14px 7px; color: var(--muted); white-space: nowrap; }
+.tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--amber); }
+
+table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+th { text-align: left; font-weight: 600; color: var(--muted); font-size: 13px; padding: 10px 8px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th button { background: none; border: 0; padding: 0; color: inherit; font-weight: inherit; }
+td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--raise); }
+td.num, th.num { text-align: right; }
+.qty { font-size: 18px; font-weight: 600; }
+.delta { font-size: 12px; margin-left: 4px; }
+.delta.up { color: var(--teal); } .delta.down { color: var(--rust); }
+.chip { display: inline-block; font-size: 12px; padding: 0 6px; border-radius: 3px; margin: 0 4px 0 0; vertical-align: 1px; }
+.chip.reg { background: var(--teal-bg); color: var(--teal); }
+.chip.exp { background: var(--rust-bg); color: var(--rust); }
+.chip.edit { background: var(--amber-bg); color: var(--amber); }
+.chip.tag { border: 1px solid var(--line); color: var(--muted); }
+.sub { color: var(--muted); font-size: 13px; }
+.empty { color: var(--muted); padding: 30px 0; max-width: 60ch; }
+
+.changes li { list-style: none; display: grid; grid-template-columns: 130px 1fr auto; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.changes { padding: 0; margin: 8px 0; }
+.changes time { color: var(--muted); }
+.tips { max-width: 75ch; }
+.tips h3 { margin: 24px 0 6px; font-size: 18px; }
+.tips li { margin: 6px 0; }
+.settings label { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0; max-width: 70ch; }
+.settings input[type=text] { background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 4px 8px; width: 320px; max-width: 100%; }
+.btn { background: var(--amber); color: var(--on-amber); border: 0; border-radius: 3px; padding: 6px 14px; font-weight: 600; }
+.btn.quiet { background: var(--raise); color: var(--text); border: 1px solid var(--line); }
+
+.wish h3 { margin: 26px 0 4px; font-size: 20px; font-stretch: condensed; }
+.wish td input { width: 64px; background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 2px 6px; }
+.wish tr.got td { color: var(--muted); }
+.wish tbody tr { cursor: default; }
+.need-n { color: var(--amber); font-weight: 600; }
+.have-n { color: var(--teal); font-weight: 600; }
+.addwish { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; max-width: 900px; }
+.addwish textarea, .addwish input { width: 100%; background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 6px 8px; }
+.addwish textarea { min-height: 110px; grid-row: span 3; }
+.links-list li { margin: 8px 0; list-style: none; }
+.links-list { padding: 0; }
+.about { max-width: 70ch; }
+.about .lead { font-size: 19px; }
+@media (max-width: 860px) { .addwish { grid-template-columns: 1fr; } }
+
+.addone { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; margin-top: 18px; max-width: 1000px; position: relative; }
+.field { display: flex; flex-direction: column; gap: 3px; flex: 1 1 240px; position: relative; }
+.field.small { flex: 0 0 110px; }
+.field label { font-size: 13px; color: var(--muted); }
+.field input { background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 7px 9px; width: 100%; }
+.sugg { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 4; background: var(--raise); border: 1px solid var(--line); border-radius: 0 0 4px 4px; max-height: 340px; overflow-y: auto; box-shadow: 0 10px 24px rgba(0,0,0,.3); }
+.sugg button { display: flex; justify-content: space-between; gap: 12px; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 7px 10px; }
+.sugg button:hover, .sugg button:focus { background: var(--panel); }
+.howto { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--teal); border-radius: 3px; padding: 10px 16px; margin: 10px 0; max-width: 900px; }
+.howto h4 { margin: 12px 0 4px; font-size: 15px; }
+.howto h4:first-child { margin-top: 2px; }
+.howto p { margin: 4px 0; }
+.howto ul { margin: 4px 0; padding-left: 20px; }
+.howto ul.spots { padding-left: 0; }
+.paste { margin-top: 14px; max-width: 700px; }
+.paste summary { cursor: pointer; color: var(--teal); }
+.paste textarea { width: 100%; min-height: 100px; background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 6px 8px; margin: 8px 0; }
+td.actions { white-space: nowrap; text-align: right; }
+.howrow td, .optrow td { background: none !important; cursor: default; }
+.ship { margin-top: 28px; }
+.shiphead { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
+.shiphead h3 { margin: 0; font-size: 22px; font-stretch: condensed; }
+.ship tbody tr { cursor: default; }
+.ship > .btn { margin-top: 10px; }
+.placelist { max-height: 300px; overflow-y: auto; border: 1px solid var(--line); border-radius: 3px; margin-top: 8px; max-width: 520px; }
+.placelist button { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 6px 10px; }
+.placelist button:hover { background: var(--raise); }
+
+/* Item panel */
+.drawer { position: fixed; top: 0; right: 0; height: 100vh; width: min(520px, 100vw); background: var(--panel); border-left: 1px solid var(--line); box-shadow: -12px 0 30px rgba(0,0,0,.25); transform: translateX(100%); transition: transform .18s ease-out; overflow-y: auto; padding: 22px 26px 50px; z-index: 5; }
+.drawer.open { transform: none; }
+.drawer h2 { margin: 0 34px 2px 0; font-size: 26px; font-stretch: condensed; line-height: 1.15; }
+.drawer .close { position: absolute; top: 16px; right: 18px; background: none; border: 0; font-size: 26px; line-height: 1; color: var(--muted); }
+.drawer h3 { font-size: 15px; margin: 24px 0 8px; color: var(--muted); font-weight: 600; }
+.bigqty { display: flex; align-items: baseline; gap: 14px; margin-top: 14px; }
+.bigqty b { font-size: 46px; font-weight: 700; line-height: 1; }
+.form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.form input, .form textarea { background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 5px 8px; }
+.form input[type=number] { width: 90px; }
+.form .grow { flex: 1 1 200px; }
+.form textarea { width: 100%; min-height: 60px; resize: vertical; }
+dl.grid { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0; }
+dl.grid dt { color: var(--muted); }
+dl.grid dd { margin: 0; }
+.spots li { list-style: none; padding: 4px 0; display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); }
+.spots { padding: 0; margin: 0; }
+.cmp td, .cmp th { padding: 4px 6px; font-size: 13px; }
+.cmp tr.this td { color: var(--amber); font-weight: 600; }
+.cmp tbody tr { cursor: default; }
+.hist li { list-style: none; padding: 5px 0; border-bottom: 1px solid var(--line); display: flex; gap: 10px; justify-content: space-between; }
+.hist { padding: 0; margin: 0; }
+
+.toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 20px); background: var(--text); color: var(--hull); padding: 9px 18px; border-radius: 4px; opacity: 0; transition: .2s; pointer-events: none; z-index: 9; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: 1fr; }
+  .rail { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .rail .list { display: flex; overflow-x: auto; gap: 4px; padding: 0 16px; }
+  .sys { margin-top: 0; display: contents; }
+  .sys h2 { display: none; }
+  .st { min-width: 180px; border-left: 0; border-bottom: 3px solid transparent; padding: 6px 10px; }
+  .st[aria-current="true"] { border-bottom-color: var(--amber); }
+  main { padding: 18px 16px 50px; }
+  .search input { font-size: 20px; }
+  .hide-sm { display: none; }
+  .changes li { grid-template-columns: 1fr auto; }
+  .changes time { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) { .drawer, .toast { transition: none; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="rail" aria-label="Stations">
+    <div class="brand"><h1>Storage manifest</h1><p>SC Inventory Tracker __VERSION__</p></div>
+    <div class="list" id="rail"></div>
+  </aside>
+  <main>
+    <div class="search">
+      <label for="q">Find</label>
+      <input id="q" type="search" placeholder="Item, maker, type or tag" autocomplete="off">
+    </div>
+    <div class="filters">
+      <label>Type <select id="ftype"><option value="">Any</option></select></label>
+      <label>Sort <select id="fsort">
+        <option value="name">Name</option><option value="qty">Quantity</option>
+        <option value="value">Value</option><option value="changed">Recently changed</option>
+      </select></label>
+      <label><input type="checkbox" id="fchanged"> Changed since scan</label>
+      <label><input type="checkbox" id="freg"> Registered to you</label>
+      <label><input type="checkbox" id="fspread"> At more than one station</label>
+      <label><input type="checkbox" id="fammo" checked> Hide magazines and batteries</label>
+    </div>
+    <div id="needs"></div>
+    <div class="head" id="head"></div>
+    <div class="tabs" role="tablist" id="tabs">
+      <button role="tab" data-tab="items" aria-selected="true">Items</button>
+      <button role="tab" data-tab="changes">Changes</button>
+      <button role="tab" data-tab="expired">Expired</button>
+      <button role="tab" data-tab="wish">Wish list</button>
+      <button role="tab" data-tab="ships">Ships</button>
+      <button role="tab" data-tab="tips">Tips</button>
+      <button role="tab" data-tab="links">Links</button>
+      <button role="tab" data-tab="settings">Settings</button>
+      <button role="tab" data-tab="about">About</button>
+    </div>
+    <section id="view" aria-live="polite"></section>
+  </main>
+</div>
+<aside class="drawer" id="drawer" aria-label="Item" aria-hidden="true"></aside>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const TOKEN = "__TOKEN__";
+const S = { model: null, station: "", tab: "items", sort: "name", open: null, tips: null, settings: null, editing: false };
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmt = (n) => n == null ? "" : Math.round(n).toLocaleString();
+const ago = (ts) => {
+  if (!ts) return "";
+  const d = (Date.now() / 1000 - ts) / 86400;
+  if (d < 1 / 24) return "just now";
+  if (d < 1) return `${Math.round(d * 24)} h ago`;
+  if (d < 2) return "yesterday";
+  return `${Math.round(d)} days ago`;
+};
+const when = (ts) => new Date(ts * 1000).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const HIDE_AMMO = /^(magazine|battery)$/i;
+
+async function api(path, body) {
+  const opt = { headers: { "X-Token": TOKEN } };
+  if (body) { opt.method = "POST"; opt.headers["Content-Type"] = "application/json"; opt.body = JSON.stringify(body); }
+  const r = await fetch(path, opt);
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || "Request failed");
+  return j;
+}
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600); }
+async function post(path, body) {
+  try { const j = await api(path, body); S.model = j.model; toast(j.message); render(); return true; }
+  catch (e) { toast(e.message); return false; }
+}
+async function load() {
+  try { S.model = await api("/api/model"); render(); }
+  catch (e) { $("view").innerHTML = `<p class="empty">Can't reach the tracker. Is it still running? (${esc(e.message)})</p>`; }
+}
+
+/* ---------- rail ---------- */
+function renderRail() {
+  const m = S.model, bySys = {};
+  for (const s of m.stations) (bySys[s.system || "Other"] ||= []).push(s);
+  const total = m.items.reduce((a, i) => a + i.qty, 0);
+  let h = `<div class="sys"><button class="st" data-st="" aria-current="${S.station === ""}">
+      <span class="n"><b>All stations</b><span>${fmt(total)}</span></span><small>${m.stations.length} ${m.stations.length === 1 ? "station" : "stations"}</small></button></div>`;
+  for (const [sys, list] of Object.entries(bySys)) {
+    h += `<div class="sys"><h2>${esc(sys)}</h2>`;
+    for (const s of list) {
+      const age = s.age_days, pct = age == null ? 0 : Math.max(6, 100 - age * 7);
+      const note = !s.scan ? "Not scanned, log changes only" : s.scan.before_patch ? "Scanned before the last patch" : s.untracked_changes ? "Changed outside the log, rescan" :
+        s.scan.repeat_warning ? "Kiosk listed items twice, rescan" : !s.scan.complete ? "Scan incomplete" :
+        `Scanned ${ago(s.scan.last)}`;
+      const warn = !s.scan || s.scan.before_patch || s.untracked_changes || s.scan.repeat_warning || !s.scan.complete;
+      h += `<button class="st" data-st="${esc(s.key)}" title="${esc(s.key)}" aria-current="${S.station === s.key}">
+        <span class="n"><b>${esc(s.name)}</b><span>${fmt(s.qty)}</span></span>
+        <span class="fresh ${age == null ? "none" : age > 7 ? "old" : ""}"><i style="width:${pct}%"></i></span>
+        <small class="${warn ? "warn" : ""}">${esc(note)}</small></button>`;
+    }
+    h += `</div>`;
+  }
+  $("rail").innerHTML = h;
+}
+
+/* ---------- filters ---------- */
+function filtered() {
+  const q = $("q").value.trim().toLowerCase(), type = $("ftype").value;
+  let rows = S.model.items.filter(i => !S.station || i.location_key === S.station);
+  if (S.tab === "expired") rows = rows.filter(i => i.expired > 0);
+  else rows = rows.filter(i => i.qty > 0 || i.changed);
+  if ($("fammo").checked && S.tab !== "expired") rows = rows.filter(i => !HIDE_AMMO.test(i.item_type || ""));
+  if (type) rows = rows.filter(i => (i.item_type || "Unknown") === type);
+  if ($("fchanged").checked) rows = rows.filter(i => i.changed);
+  if ($("freg").checked) rows = rows.filter(i => i.registered > 0);
+  if ($("fspread").checked) rows = rows.filter(i => i.also_at.length);
+  if (q) rows = rows.filter(i => [i.name, i.manufacturer, i.item_type, i.item_class, i.location, i.note, ...(i.tags || [])]
+      .some(v => (v || "").toLowerCase().includes(q)));
+  const s = $("fsort").value;
+  const by = { name: (a, b) => a.name.localeCompare(b.name), qty: (a, b) => b.qty - a.qty,
+    value: (a, b) => (b.value || 0) - (a.value || 0), changed: (a, b) => (b.last_change || 0) - (a.last_change || 0) }[s];
+  return rows.sort(by);
+}
+function fillTypes() {
+  const sel = $("ftype"), cur = sel.value;
+  const types = [...new Set(S.model.items.map(i => i.item_type || "Unknown"))].sort();
+  sel.innerHTML = `<option value="">Any</option>` + types.map(t => `<option ${t === cur ? "selected" : ""}>${esc(t)}</option>`).join("");
+}
+
+/* ---------- header ---------- */
+function renderHead() {
+  const m = S.model;
+  if (!S.station) {
+    const value = m.items.reduce((a, i) => a + (i.value || 0), 0);
+    const kinds = m.items.filter(i => i.qty > 0).length;
+    $("head").innerHTML = `<h2>Everything you have stored</h2><div class="facts">
+      <span><b>${fmt(kinds)}</b> different items</span><span><b>${m.stations.length}</b> ${m.stations.length === 1 ? "station" : "stations"}</span>
+      ${value ? `<span>Worth about <b>${fmt(value)}</b> aUEC at best known sell prices</span>` : ""}</div>`;
+    return;
+  }
+  const s = m.stations.find(x => x.key === S.station);
+  if (!s) { S.station = ""; return renderHead(); }
+  const sc = s.scan;
+  const facts = [];
+  if (sc) {
+    facts.push(`<span>Scanned <b>${ago(sc.last)}</b></span>`);
+    facts.push(`<span><b>${fmt(sc.identified)}</b>${sc.total ? ` of ${fmt(sc.total)}` : ""} tiles identified</span>`);
+    if (!sc.complete) facts.push(`<span class="warn">Scan not complete</span>`);
+    if (sc.newer_partial) facts.push(`<span class="warn">A newer, unfinished scan exists</span>`);
+    if (sc.before_patch) facts.push(`<span class="warn">Scanned before the current game version. Rescan after patches.</span>`);
+    if (sc.repeat_warning) facts.push(`<span class="warn">The kiosk listed some items twice. Reopen it and rescan.</span>`);
+  } else facts.push(`<span class="warn">Not scanned yet. Showing only changes from the game log.</span>`);
+  if (s.changes) facts.push(`<span><b>${s.changes}</b> changes since</span>`);
+  if (s.untracked_changes) facts.push(`<span class="warn">Storage changed in ways the log can't show (freight elevator?). Rescan to be sure.</span>`);
+  if (s.value) facts.push(`<span>Worth about <b>${fmt(s.value)}</b> aUEC</span>`);
+  $("head").innerHTML = `<div><h2>${esc(s.name)}</h2><div class="sub">${esc(s.system)}, game id ${esc(s.key)}
+     <button class="linkish" id="rename">Rename</button></div></div><div class="facts">${facts.join("")}</div>`;
+  $("rename").onclick = async () => {
+    if ($("renamebox")) { $("renamebox").remove(); return; }
+    const all = await api(`/api/places?key=${encodeURIComponent(s.key)}`);
+    const box = document.createElement("div"); box.id = "renamebox"; box.className = "howto";
+    box.innerHTML = `<p>Pick the right name from the game's own place names. The closest matches are at the top.</p>
+      <div class="field"><input id="rq" placeholder="Filter, e.g. Alpha or Gateway" autocomplete="off"></div>
+      <div class="placelist" id="rlist"></div>`;
+    $("head").after(box);
+    const draw = () => { const q = $("rq").value.trim().toLowerCase();
+      $("rlist").innerHTML = all.filter(n => !q || n.toLowerCase().includes(q)).slice(0, 60)
+        .map(n => `<button type="button" data-n="${esc(n)}">${esc(n)}</button>`).join(""); };
+    draw(); $("rq").oninput = draw; $("rq").focus();
+    $("rlist").onclick = e => { const b = e.target.closest("button"); if (!b) return;
+      post("/api/station_name", { key: s.key, name: b.dataset.n }); box.remove(); };
+  };
+}
+
+/* ---------- needs you ---------- */
+function renderNeeds() {
+  const n = S.model.needs_you;
+  if (!n.length) { $("needs").innerHTML = ""; return; }
+  const stOpts = S.model.stations.map(s => `<option value="${esc(s.key)}">${esc(s.name)}</option>`).join("");
+  $("needs").innerHTML = `<div class="needs"><h3>${n.length === 1 ? "One thing needs you" : `${n.length} things need you`}</h3>` +
+    n.slice(0, 8).map((x, k) => {
+      let ctl = "";
+      if (x.kind === "buy") ctl = `<select data-k="${k}" class="nloc"><option value="">Pick station</option>${stOpts}</select>
+         <button class="btn" data-act="loc" data-k="${k}">Assign</button>`;
+      if (x.kind === "sell") {
+        const here = S.model.items.filter(i => i.location_key === x.location_key && i.qty > 0);
+        ctl = `<select data-k="${k}" class="nitem"><option value="">Pick item</option>${here.map(i =>
+          `<option value="${esc(i.name)}">${esc(i.name)} (${fmt(i.qty)})</option>`).join("")}</select>
+          <input type="number" class="nqty" data-k="${k}" value="${x.qty}" aria-label="Quantity">
+          <button class="btn" data-act="item" data-k="${k}">Record</button>`;
+      }
+      return `<div class="need"><p>${esc(x.text)} <span class="sub">${when(x.ts)}</span></p>${ctl}
+        <button class="btn quiet" data-act="ignore" data-k="${k}">Ignore</button></div>`;
+    }).join("") + `</div>`;
+  $("needs").querySelectorAll("button[data-act]").forEach(b => b.onclick = () => {
+    const x = n[+b.dataset.k], act = b.dataset.act;
+    if (act === "ignore") return post("/api/event", { event_id: x.event_id, choice: "ignore" });
+    if (act === "loc") {
+      const v = $("needs").querySelector(`.nloc[data-k="${b.dataset.k}"]`).value;
+      if (!v) return toast("Pick the station first.");
+      return post("/api/event", { event_id: x.event_id, choice: "location", location_key: v });
+    }
+    const name = $("needs").querySelector(`.nitem[data-k="${b.dataset.k}"]`).value;
+    const qty = $("needs").querySelector(`.nqty[data-k="${b.dataset.k}"]`).value;
+    if (!name) return toast("Pick the item first.");
+    post("/api/event", { event_id: x.event_id, choice: "item", location_key: x.location_key, name, qty });
+  });
+}
+
+/* ---------- views ---------- */
+function itemRow(i) {
+  const ch = i.log_change + i.your_change;
+  const chips = [i.registered ? `<span class="chip reg">Registered</span>` : "",
+    i.your_change ? `<span class="chip edit">Edited</span>` : "",
+    i.expired && S.tab !== "expired" ? `<span class="chip exp">${i.expired} expired</span>` : "",
+    ...(i.tags || []).map(t => `<span class="chip tag">${esc(t)}</span>`)].join("");
+  const spec = [i.size && `S${i.size}`, i.grade && `Grade ${i.grade}`, i.item_class].filter(Boolean).join(", ");
+  return `<tr data-i="${S.rows.indexOf(i)}">
+    <td><div>${esc(i.name)}</div><div class="sub">${chips}${esc(i.manufacturer || "")}</div></td>
+    <td class="num"><span class="qty">${fmt(S.tab === "expired" ? i.expired : i.qty)}</span>${ch && S.tab !== "expired" ?
+      `<span class="delta ${ch > 0 ? "up" : "down"}">${ch > 0 ? "+" : ""}${ch}</span>` : ""}</td>
+    ${S.station ? "" : `<td>${esc(i.location)}</td>`}
+    <td class="hide-sm">${esc(i.item_type || "")}<div class="sub">${esc(spec)}</div></td>
+    <td class="num hide-sm">${i.value ? fmt(i.value) : ""}</td>
+    <td class="hide-sm sub">${i.also_at.length ? esc(i.also_at.slice(0, 2).join(", ")) + (i.also_at.length > 2 ? ` +${i.also_at.length - 2}` : "") : ""}</td></tr>`;
+}
+function renderItems() {
+  const rows = filtered();
+  S.rows = rows;
+  if (!S.model.stations.length) {
+    $("view").innerHTML = `<p class="empty">Nothing scanned yet. Start the tracker with run.bat, open a storage kiosk in game and press its Stack button. The Tips tab has the details.</p>`;
+    return;
+  }
+  if (!rows.length) {
+    $("view").innerHTML = `<p class="empty">${S.tab === "expired" ? "No expired items here." : "No items match. Clear the search or filters to see everything."}</p>`;
+    return;
+  }
+  $("view").innerHTML = `<table><thead><tr><th>Item</th><th class="num">${S.tab === "expired" ? "Expired" : "Qty"}</th>
+    ${S.station ? "" : "<th>Station</th>"}<th class="hide-sm">Type</th><th class="num hide-sm">Value</th><th class="hide-sm">Also at</th></tr></thead>
+    <tbody>${rows.map(itemRow).join("")}</tbody></table>
+    <p class="sub">${rows.length} items. Values use the best sell price UEX players have reported, so check the date in each item.</p>`;
+  $("view").querySelectorAll("tbody tr").forEach(tr => tr.onclick = () => openItem(S.rows[+tr.dataset.i]));
+}
+function renderChanges() {
+  const ch = S.model.changes.filter(c => !S.station || c.location_key === S.station);
+  if (!ch.length) { $("view").innerHTML = `<p class="empty">No changes since the last scan${S.station ? " here" : ""}. Items you move, buy or edit show up here.</p>`; return; }
+  $("view").innerHTML = `<ul class="changes">${ch.slice(0, 300).map(c => `<li><time>${when(c.ts)}</time>
+     <span>${c.delta > 0 ? "+" : ""}${c.delta} ${esc(c.item)} <span class="sub">${esc(c.what)}${S.station ? "" : `, ${esc(c.location)}`}</span></span>
+     <span>${c.adjustment_id ? `<button class="linkish" data-undo="${c.adjustment_id}">Undo</button>` : `<span class="sub">${c.source === "log" ? "from game log" : esc(c.source)}</span>`}</span></li>`).join("")}</ul>`;
+  $("view").querySelectorAll("[data-undo]").forEach(b => b.onclick = () => post("/api/undo", { adjustment_id: +b.dataset.undo }));
+}
+async function renderTips() {
+  S.tips ||= await api("/api/tips");
+  $("view").innerHTML = `<div class="tips">${S.tips.map(t => `<h3>${esc(t.head)}</h3><ul>${t.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`).join("")}</div>`;
+}
+async function renderSettings() {
+  S.settings = await api("/api/settings");
+  const s = S.settings;
+  const box = (k, label, help) => `<label><input type="checkbox" data-k="${k}" ${s[k] ? "checked" : ""}><span><b>${label}</b><br><span class="sub">${help}</span></span></label>`;
+  $("view").innerHTML = `<div class="settings">
+    <label><span><b>Shop helper</b><br><span class="sub">At a shop terminal, label the items you already own and where.</span><br>
+      <select id="shop"><option value="key">When I press Insert</option><option value="auto">Automatically (uses more CPU)</option><option value="off">Off</option></select></span></label>
+    ${box("overlay", "Show the overlay while scanning", "Dots and outlines over the kiosk tiles. Turn off if the game stutters; clicks and chimes still tell you what's recorded.")}
+    ${box("sound", "Sounds", "A click for each item, a chime when a page is done.")}
+    ${box("track_from_log", "Keep stations up to date from the game log", "Moves in and out of storage and shop purchases, between scans.")}
+    ${box("fetch_item_data", "Fetch prices and item stats", "From api.star-citizen.wiki. Only item ids are sent, nothing about you.")}
+    ${box("dashboard_with_live", "Run this dashboard while scanning", "Opens at the same address while live mode runs.")}
+    <label><span><b>Left out of summary.csv</b><br><span class="sub">Item types, separated by commas</span><br>
+      <input type="text" id="hide" value="${esc((s.summary_hide_types || []).join(", "))}"></span></label>
+    <button class="btn" id="save">Save settings</button>
+    <h3 style="margin-top:34px">Share with your org or friends</h3>
+    <p class="sub">Makes a file listing your stations and items, with no names, log ids or history. Add a label so they know whose it is.</p>
+    <div class="form"><input id="slabel" class="grow" placeholder="Label, e.g. your handle"><label><input type="checkbox" id="snotes"> Include my notes and tags</label>
+    <button class="btn quiet" id="share">Make share file</button></div>
+    <h3 style="margin-top:34px">After a wipe</h3>
+    <p class="sub">If a patch clears everyone's storage, start fresh. Earlier scans stay in the database but stop showing.</p>
+    <button class="btn quiet" id="fresh">Start fresh</button>
+    <p class="sub">Theme: <button class="linkish" data-theme="">match Windows</button> <button class="linkish" data-theme="dark">dark</button> <button class="linkish" data-theme="light">light</button></p></div>`;
+  $("shop").value = s.shop_helper || "key";
+  $("save").onclick = () => {
+    const b = {};
+    $("view").querySelectorAll("input[data-k]").forEach(i => b[i.dataset.k] = i.checked);
+    b.shop_helper = $("shop").value;
+    b.summary_hide_types = $("hide").value.split(",").map(x => x.trim()).filter(Boolean);
+    post("/api/settings", b);
+  };
+  $("share").onclick = () => post("/api/share", { label: $("slabel").value, notes: $("snotes").checked });
+  $("fresh").onclick = () => { if (confirm("Hide all earlier scans and changes? Do this only after a storage wipe.")) post("/api/fresh_start", {}); };
+  $("view").querySelectorAll("[data-theme]").forEach(x => x.onclick = () => setTheme(x.dataset.theme));
+}
+/* ---------- shared: item search box and "how to get it" ---------- */
+function itemSearch(el, onPick, endpoint = "/api/suggest") {
+  const box = document.createElement("div"); box.className = "sugg"; el.after(box);
+  let t = null, rows = [];
+  el.addEventListener("input", () => {
+    clearTimeout(t);
+    t = setTimeout(async () => {
+      rows = el.value.trim().length < 2 ? [] : await api(`${endpoint}?q=${encodeURIComponent(el.value.trim())}`);
+      box.innerHTML = rows.map((r, k) => `<button type="button" data-k="${k}">${esc(r.name)}
+        <span class="sub">${r.have ? `you have ${fmt(r.have)}` : (r.maker ? esc(r.maker) + (r.role ? ", " + esc(r.role) : "") : "")}</span></button>`).join("");
+      box.style.display = rows.length ? "block" : "none";
+    }, 180);
+  });
+  box.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+    const r = rows[+b.dataset.k]; el.value = r.name; box.style.display = "none"; onPick(r); });
+  el.addEventListener("keydown", e => { if (e.key === "Escape") box.style.display = "none"; });
+}
+function howtoHtml(h) {
+  const parts = [];
+  parts.push(h.owned && h.owned.length ? `<p><b>You have ${fmt(h.owned.reduce((a, o) => a + o.qty, 0))}</b>: ${h.owned.map(o => `${esc(o.location)} (${fmt(o.qty)})`).join(", ")}</p>`
+    : `<p><b>You don't have any stored.</b></p>`);
+  if (!h.found) { parts.push(`<p class="sub">No item data for this one yet, so there's nothing more to say about where to get it.</p>`); return parts.join(""); }
+  const spec = [h.size && `Size ${h.size}`, h.grade && `Grade ${h.grade}`, h.item_class].filter(Boolean).join(", ");
+  if (spec) parts.push(`<p class="sub">${esc(spec)}</p>`);
+  if (h.buy && h.buy.length) parts.push(`<h4>Buy it</h4><ul class="spots">${h.buy.map(b => `<li><span>${esc(b.terminal || b.place)}<br><span class="sub">${esc(b.system || "")}, reported ${esc(b.date)}</span></span><b>${fmt(b.buy)}</b></li>`).join("")}</ul>`);
+  else parts.push(`<h4>Buy it</h4><p>Not sold in any shop that players have reported to UEX.</p>`);
+  if (h.craft) {
+    const c = h.craft;
+    let t = `<h4>Craft it</h4>`;
+    t += c.default ? `<p>The blueprint is available from the start.</p>` : c.missions.length
+      ? `<p>Get the blueprint from ${c.missions.length === 1 ? "this contract" : "one of these contracts"}:</p><ul>${c.missions.map(m => `<li>${esc(m.title)}${m.chance && m.chance < 1 ? ` <span class="sub">(${Math.round(m.chance * 100)}% chance)</span>` : ` <span class="sub">(guaranteed)</span>`}</li>`).join("")}</ul>`
+      : `<p>Craftable, but the item data doesn't list where the blueprint comes from.</p>`;
+    if (c.ingredients.length) t += `<p class="sub">Needs ${c.ingredients.map(i => `${esc(i.name)}${i.scu ? ` ${i.scu} SCU` : i.qty ? ` x${i.qty}` : ""}`).join(", ")}${c.time ? `. Takes ${esc(c.time)}.` : "."}</p>`;
+    parts.push(t);
+  }
+  if (h.ships && h.ships.length) parts.push(`<h4>Comes fitted on</h4><p>${h.ships.slice(0, 12).map(esc).join(", ")}${h.ships.length > 12 ? ` and ${h.ships.length - 12} more` : ""}.</p>
+    <p class="sub">Players often get parts like this by looting or salvaging those ships, or by taking them off one they own.</p>`);
+  if (h.loot) parts.push(`<h4>Loot</h4><p>Can turn up as loot.</p>`);
+  if (h.events && h.events.length) parts.push(`<h4>Events</h4><p>${h.events.map(e => esc(e.name || e)).join(", ")}</p>`);
+  if (h.sell && h.sell.length) parts.push(`<p class="sub">Sells for up to ${fmt(h.sell[0].sell)} at ${esc(h.sell[0].terminal || h.sell[0].place)}.</p>`);
+  if (h.url) parts.push(`<p class="sub"><a href="${esc(h.url)}" target="_blank" rel="noopener">More on star-citizen.wiki</a></p>`);
+  return parts.join("");
+}
+
+/* ---------- wish list ---------- */
+async function renderWish() {
+  const w = S.model.wishlist || [];
+  const lists = [...new Set(w.map(x => x.list))];
+  let h = `<div class="wish"><div class="addone">
+      <div class="field"><label for="wq">Item</label><input id="wq" autocomplete="off" placeholder="Start typing, e.g. Blizzard or P4-AR"></div>
+      <div class="field small"><label for="wqty">How many</label><input id="wqty" type="number" min="1" value="1"></div>
+      <div class="field"><label for="wlist">List</label><input id="wlist" list="wlists" placeholder="e.g. Centaurus refit" value="${esc(lists[0] || "Wish list")}"></div>
+      <button class="btn" id="wadd" disabled>Add</button></div>
+    <div id="wpreview" class="howto" hidden></div>
+    <details class="paste"><summary>Paste a list instead</summary>
+      <textarea id="wnames" placeholder="One item per line, e.g. from Erkul:\nFR-76\n2 x Bulwark"></textarea>
+      <button class="btn quiet" id="wpaste">Add these</button></details>
+    <datalist id="wlists">${lists.map(l => `<option value="${esc(l)}">`).join("")}</datalist>`;
+  if (!w.length) h += `<p class="empty">Nothing on your wish list yet. Search for an item above to see how to get it, or set up your ships on the Ships tab and add the parts you want.</p>`;
+  for (const l of lists) {
+    const rows = w.filter(x => x.list === l);
+    const need = rows.filter(x => !x.done && x.need > 0).length;
+    h += `<h3>${esc(l)}</h3><p class="sub">${need ? `${need} still to get` : "You have everything on this list"}</p>
+      <table><thead><tr><th>Item</th><th class="num">Want</th><th class="num">Have</th><th class="hide-sm">Where you have it</th><th></th></tr></thead><tbody>` +
+      rows.map(x => `<tr class="${x.need === 0 || x.done ? "got" : ""}"><td>${esc(x.name)}${x.note ? `<div class="sub">${esc(x.note)}</div>` : ""}</td>
+        <td class="num"><input type="number" min="1" value="${x.qty}" data-wq="${x.id}" aria-label="How many you want"></td>
+        <td class="num"><span class="${x.need ? "need-n" : "have-n"}">${fmt(x.owned)}</span></td>
+        <td class="hide-sm sub">${x.where.map(p => `${esc(p.location)} (${fmt(p.qty)})`).join(", ") || "None stored"}</td>
+        <td class="actions"><button class="linkish" data-how="${x.id}">How to get it</button> <button class="linkish" data-wdel="${x.id}">Remove</button></td></tr>
+        <tr class="howrow" id="how-${x.id}" hidden><td colspan="5"><div class="howto">Looking it up...</div></td></tr>`).join("") + `</tbody></table>`;
+  }
+  $("view").innerHTML = h + `</div>`;
+  let picked = null;
+  itemSearch($("wq"), async r => {
+    picked = r; $("wadd").disabled = false;
+    const p = $("wpreview"); p.hidden = false; p.innerHTML = "Looking it up...";
+    p.innerHTML = `<h4>${esc(r.name)}</h4>` + howtoHtml(await api(`/api/howto?id=${encodeURIComponent(r.id || "")}&name=${encodeURIComponent(r.name)}`));
+  });
+  $("wq").addEventListener("input", () => { picked = null; $("wadd").disabled = true; });
+  $("wadd").onclick = () => picked && post("/api/wish_add", { name: picked.name, id: picked.id, qty: +$("wqty").value || 1, list: $("wlist").value.trim() });
+  $("wpaste").onclick = () => post("/api/wish_add", { names: $("wnames").value, list: $("wlist").value.trim() });
+  $("view").querySelectorAll("[data-wdel]").forEach(b => b.onclick = () => post("/api/wish_delete", { id: +b.dataset.wdel }));
+  $("view").querySelectorAll("[data-wq]").forEach(i => i.onchange = () => post("/api/wish_update", { id: +i.dataset.wq, qty: +i.value || 1 }));
+  $("view").querySelectorAll("[data-how]").forEach(b => b.onclick = async () => {
+    const row = $(`how-${b.dataset.how}`); row.hidden = !row.hidden;
+    if (row.hidden || row.dataset.done) return;
+    const x = w.find(x => x.id === +b.dataset.how);
+    row.querySelector(".howto").innerHTML = howtoHtml(await api(`/api/howto?id=${encodeURIComponent(x.item_id || "")}&name=${encodeURIComponent(x.name)}`));
+    row.dataset.done = 1;
+  });
+}
+
+/* ---------- ships ---------- */
+async function renderShips() {
+  const d = await api("/api/ships");
+  let h = `<div class="ships"><div class="addone">
+      <div class="field"><label for="sq">Add a ship</label><input id="sq" autocomplete="off" placeholder="${d.count ? "e.g. Constellation Mk V or Cutlass" : "Ship list still downloading..."}"></div>
+      <div class="field"><label for="snick">Nickname (optional)</label><input id="snick" placeholder="e.g. The Big Girl"></div>
+      <button class="btn" id="sadd" disabled>Add ship</button></div>`;
+  if (!d.ships.length) h += `<p class="empty">Add the ships you fly. Each one shows its parts, slot by slot, what you've fitted, and what you already have in storage. Change a part to see the options, then add what you want to your wish list.</p>`;
+  for (const s of d.ships) {
+    h += `<section class="ship" data-ship="${s.id}"><div class="shiphead"><div><h3>${esc(s.nickname || s.name)}</h3>
+      <div class="sub">${s.nickname ? esc(s.name) + ", " : ""}${esc(s.role || "")}</div></div>
+      <div><button class="linkish" data-sdel="${s.id}">Remove</button></div></div>`;
+    if (!s.groups.length) { h += `<p class="sub">Fetching this ship's parts. Check back in a moment.</p></section>`; continue; }
+    h += `<table><thead><tr><th>Part</th><th class="num">Size</th><th>Fitted</th><th class="num">In storage</th><th></th><th class="num">Want</th></tr></thead><tbody>` +
+      s.groups.map((g, k) => `<tr>
+        <td>${esc(g.label)}${g.count > 1 ? ` <span class="sub">x${g.count}</span>` : ""}</td>
+        <td class="num">${g.size ?? ""}</td>
+        <td>${esc(g.fitted.name || "Empty")} ${g.changed ? `<span class="chip edit">your fit</span>` : `<span class="chip tag">stock</span>`}</td>
+        <td class="num">${g.have ? `<span class="have-n">${fmt(g.have)}</span>` : `<span class="sub">0</span>`}</td>
+        <td class="actions"><button class="linkish" data-opt="${s.id}:${k}">Change</button>${g.changed ? ` <button class="linkish" data-stock="${s.id}:${k}">Back to stock</button>` : ""}</td>
+        <td class="num"><input type="checkbox" data-want="${s.id}:${k}" ${g.changed && !g.have ? "checked" : ""} aria-label="Add to wish list"></td></tr>
+        <tr class="optrow" id="opt-${s.id}-${k}" hidden><td colspan="6"></td></tr>`).join("") +
+      `</tbody></table><button class="btn quiet" data-swish="${s.id}">Add ticked parts to wish list</button></section>`;
+  }
+  $("view").innerHTML = h + `</div>`;
+  let pickedShip = null;
+  itemSearch($("sq"), r => { pickedShip = r; $("sadd").disabled = false; }, "/api/vehicles");
+  $("sadd").onclick = async () => { if (pickedShip && await post("/api/ship_add", { cls: pickedShip.cls, nickname: $("snick").value })) setTimeout(renderShips, 2500); };
+  const ship = id => d.ships.find(s => s.id === +id);
+  $("view").querySelectorAll("[data-sdel]").forEach(b => b.onclick = () => { if (confirm("Remove this ship?")) post("/api/ship_delete", { id: +b.dataset.sdel }).then(renderShips); });
+  $("view").querySelectorAll("[data-stock]").forEach(b => b.onclick = () => {
+    const [sid, k] = b.dataset.stock.split(":"); const g = ship(sid).groups[+k];
+    post("/api/ship_fit", { ship_id: +sid, slots: g.slots, item_id: null }).then(renderShips);
+  });
+  $("view").querySelectorAll("[data-swish]").forEach(b => b.onclick = () => {
+    const s = ship(b.dataset.swish);
+    const items = [...$("view").querySelectorAll(`[data-want^="${s.id}:"]:checked`)].map(c => {
+      const g = s.groups[+c.dataset.want.split(":")[1]];
+      return { name: g.fitted.name, id: g.fitted.id, qty: Math.max(1, g.count - g.have), note: `${g.label}, size ${g.size}` };
+    });
+    if (!items.length) return toast("Tick the parts you want first.");
+    post("/api/ship_wish", { list: s.nickname || s.name, items });
+  });
+  $("view").querySelectorAll("[data-opt]").forEach(b => b.onclick = async () => {
+    const [sid, k] = b.dataset.opt.split(":"); const s = ship(sid), g = s.groups[+k];
+    const row = $(`opt-${sid}-${k}`); row.hidden = !row.hidden; if (row.hidden) return;
+    const cell = row.firstElementChild; cell.innerHTML = `<div class="howto">Loading size ${g.size} options...</div>`;
+    const opts = await api(`/api/options?type=${encodeURIComponent(g.item_type)}&size=${g.size}`);
+    if (!opts.length) { cell.innerHTML = `<div class="howto">No size ${g.size} options in the item data yet.</div>`; return; }
+    const main = { Cooler: "coolant", PowerPlant: "power", Shield: "shield_hp" }[g.item_type];
+    opts.sort((a, b) => (b.have - a.have) || ((b.stats[main] || 0) - (a.stats[main] || 0)));
+    cell.innerHTML = `<div class="howto"><table class="cmp"><thead><tr><th>Option</th><th>Grade</th><th>Class</th>${main ? `<th class="num">Output</th>` : ""}<th class="num">IR</th><th class="num">EM</th><th class="num">Cheapest</th><th class="num">You have</th><th></th></tr></thead><tbody>` +
+      opts.map((o, j) => `<tr class="${o.id === (g.fitted.id || "").toLowerCase() ? "this" : ""}"><td>${esc(o.name)}</td><td>${esc(o.grade || "")}</td><td>${esc(o.item_class || "")}</td>
+        ${main ? `<td class="num">${fmt(o.stats[main])}</td>` : ""}<td class="num">${fmt(o.stats.ir)}</td><td class="num">${fmt(o.stats.em)}</td>
+        <td class="num">${o.cheapest ? fmt(o.cheapest) : `<span class="sub">not sold</span>`}</td><td class="num">${o.have ? `<span class="have-n">${fmt(o.have)}</span>` : ""}</td>
+        <td class="actions"><button class="linkish" data-fit="${j}">Fit this</button> <button class="linkish" data-ohow="${j}">How to get it</button></td></tr>`).join("") +
+      `</tbody></table><div class="ohow"></div><p class="sub">Stealth parts run quieter (lower IR and EM), Military ones are tougher, Competition ones push output. "Fit this" records your plan for this ship; it doesn't change the game.</p></div>`;
+    cell.querySelectorAll("[data-fit]").forEach(x => x.onclick = () => { const o = opts[+x.dataset.fit];
+      post("/api/ship_fit", { ship_id: +sid, slots: g.slots, item_id: o.id, item_name: o.name }).then(renderShips); });
+    cell.querySelectorAll("[data-ohow]").forEach(x => x.onclick = async () => { const o = opts[+x.dataset.ohow];
+      const box = cell.querySelector(".ohow"); box.innerHTML = `<h4>${esc(o.name)}</h4>Looking it up...`;
+      box.innerHTML = `<h4>${esc(o.name)}</h4>` + howtoHtml(await api(`/api/howto?id=${encodeURIComponent(o.id)}&name=${encodeURIComponent(o.name)}`)); });
+  });
+}
+async function renderLinks() {
+  S.links ||= await api("/api/links");
+  $("view").innerHTML = `<div class="tips">${S.links.map(g => `<h3>${esc(g.head)}</h3><ul class="links-list">${g.items.map(l =>
+    `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)}</a><br><span class="sub">${esc(l.about)}</span></li>`).join("")}</ul>`).join("")}
+    <p class="sub">Know a good one that's missing? Suggest it on the project's GitHub page.</p></div>`;
+}
+async function renderAbout() {
+  S.about ||= await api("/api/about");
+  const a = S.about, au = a.author;
+  $("view").innerHTML = `<div class="about tips">
+    <h3>Made by ${esc(au.name)}${au.handle ? `, in game as ${esc(au.handle)}` : ""}</h3>
+    ${a.message.map((m, k) => `<p class="${k === a.message.length - 1 ? "lead" : ""}">${esc(m)}</p>`).join("")}
+    ${au.org ? `<p>Org: ${esc(au.org)}</p>` : ""}
+    ${au.repo ? `<p><a href="${esc(au.repo)}" target="_blank" rel="noopener">Project page, updates and issues</a></p>` : ""}
+    <h3>How it treats your game and your data</h3><ul>${a.rules.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
+    <p class="sub">SC Inventory Tracker ${esc(a.version)}</p></div>`;
+}
+function setTheme(t) {
+  if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+  try { localStorage.setItem("theme", t); } catch (e) {}
+}
+
+/* ---------- item panel ---------- */
+function openItem(i) {
+  S.open = { key: i.location_key, name: i.name };
+  const d = $("drawer");
+  const hist = S.model.changes.filter(c => c.location_key === i.location_key && c.item === i.name);
+  const parts = [i.scanned_qty != null ? `${fmt(i.scanned_qty)} at scan` : "not in last scan",
+    i.log_change ? `${i.log_change > 0 ? "+" : ""}${i.log_change} from game log` : "",
+    i.your_change ? `${i.your_change > 0 ? "+" : ""}${i.your_change} by you` : ""].filter(Boolean).join(", ");
+  const det = [["Type", i.item_type], ["Maker", i.manufacturer], ["Size", i.size], ["Grade", i.grade], ["Class", i.item_class],
+    ["Registered to you", i.registered ? fmt(i.registered) : ""], ["Expired", i.expired ? fmt(i.expired) : ""],
+    ["Tiles in kiosk", i.tiles || ""], ["Craftable", i.craftable ? "Yes" : ""], ["Item id", i.id]].filter(x => x[1]);
+  const stats = i.stats ? Object.entries({ coolant: "Coolant output", power: "Power output", power_use: "Power draw",
+    ir: "IR signature", em: "EM signature", health: "Health", shield_hp: "Shield health", mass: "Mass" })
+    .filter(([k]) => i.stats[k] != null).map(([k, l]) => [l, fmt(i.stats[k])]) : [];
+  const spot = (s, key) => `<li><span>${esc(s.terminal || s.place)}<br><span class="sub">${esc(s.system || "")}, reported ${esc(s.date)}</span></span><b>${fmt(s[key])}</b></li>`;
+  let cmp = "";
+  if (i.compare && i.compare.rows.length) {
+    cmp = `<h3>Other size ${esc(i.size)} ${esc((i.wiki_type || "").toLowerCase())}s</h3>
+      <table class="cmp"><thead><tr><th>Name</th><th>Grade</th><th>Class</th><th class="num">${esc(i.compare.label)}</th><th class="num">IR</th><th class="num">Cheapest</th></tr></thead><tbody>
+      ${i.compare.rows.map(r => `<tr class="${r.this ? "this" : ""}"><td>${esc(r.name)}${r.this ? " (yours)" : ""}</td><td>${esc(r.grade)}</td><td>${esc(r.item_class)}</td>
+        <td class="num">${fmt(r.main)}</td><td class="num">${fmt(r.ir)}</td><td class="num">${r.cheapest ? fmt(r.cheapest) : ""}</td></tr>`).join("")}</tbody></table>
+      <p class="sub">Higher output isn't always better: Stealth parts run quieter (lower IR and EM), Military ones are tougher, Competition ones push output. Pick for the job.</p>`;
+  }
+  d.innerHTML = `<button class="close" aria-label="Close">&times;</button>
+    <h2>${esc(i.name)}</h2><div class="sub">${esc(i.location)}, ${esc(i.system)}</div>
+    <div class="bigqty"><b>${fmt(i.qty)}</b><span class="sub">${esc(parts)}</span></div>
+    ${i.also_at.length ? `<p class="sub">Also at ${esc(i.also_at.join(", "))}</p>` : ""}
+    <h3>Record a change</h3>
+    <div class="form"><input type="number" id="adq" step="1" placeholder="-40" aria-label="Change">
+      <input class="grow" id="adn" placeholder="What happened, e.g. sold at Levski" aria-label="Note">
+      <button class="btn" id="adgo">Record change</button></div>
+    <p class="sub">A minus number for items gone, plus for items added. The next scan of this station replaces it.</p>
+    <h3>Your note and tags</h3>
+    <div class="form"><textarea id="nt" placeholder="e.g. keep for the Centaurus refit">${esc(i.note)}</textarea>
+      <input class="grow" id="tg" placeholder="Tags, separated by commas: keep, sell, mission" value="${esc((i.tags || []).join(", "))}">
+      <button class="btn quiet" id="ntgo">Save note</button></div>
+    ${det.length ? `<h3>Details</h3><dl class="grid">${det.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>` : ""}
+    ${stats.length ? `<h3>Stats</h3><dl class="grid">${stats.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>` : ""}
+    ${i.sell_spots && i.sell_spots.length ? `<h3>Best places to sell (per item)</h3><ul class="spots">${i.sell_spots.map(s => spot(s, "sell")).join("")}</ul>` : ""}
+    ${i.buy_spots && i.buy_spots.length ? `<h3>Cheapest places to buy</h3><ul class="spots">${i.buy_spots.map(s => spot(s, "buy")).join("")}</ul>` : ""}
+    ${cmp}
+    ${hist.length ? `<h3>Changes since the scan</h3><ul class="hist">${hist.map(c => `<li><span>${when(c.ts)}: ${c.delta > 0 ? "+" : ""}${c.delta}, ${esc(c.what)}</span>
+       ${c.adjustment_id ? `<button class="linkish" data-undo="${c.adjustment_id}">Undo</button>` : ""}</li>`).join("")}</ul>` : ""}
+    ${i.wiki_url ? `<p class="sub"><a href="${esc(i.wiki_url)}" target="_blank" rel="noopener">More on star-citizen.wiki</a></p>` : ""}`;
+  d.classList.add("open"); d.setAttribute("aria-hidden", "false");
+  d.querySelector(".close").onclick = closeItem;
+  $("adgo").onclick = async () => {
+    const q = parseInt($("adq").value, 10);
+    if (!q) return toast("Enter a change, e.g. -40 or 3.");
+    if (await post("/api/adjust", { location_key: i.location_key, name: i.name, id: i.id, delta: q, note: $("adn").value })) reopen();
+  };
+  $("ntgo").onclick = async () => {
+    if (await post("/api/note", { name: i.name, note: $("nt").value, tags: $("tg").value.split(",") })) reopen();
+  };
+  d.querySelectorAll("[data-undo]").forEach(b => b.onclick = async () => { if (await post("/api/undo", { adjustment_id: +b.dataset.undo })) reopen(); });
+  d.querySelector(".close").focus();
+}
+function reopen() {
+  if (!S.open) return;
+  const i = S.model.items.find(x => x.location_key === S.open.key && x.name === S.open.name);
+  if (i) openItem(i); else closeItem();
+}
+function closeItem() { S.open = null; const d = $("drawer"); d.classList.remove("open"); d.setAttribute("aria-hidden", "true"); }
+
+/* ---------- wiring ---------- */
+function render() {
+  if (!S.model) return;
+  renderRail(); fillTypes(); renderHead(); renderNeeds();
+  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === S.tab));
+  if (S.tab === "items" || S.tab === "expired") renderItems();
+  else if (S.tab === "changes") renderChanges();
+  else if (S.tab === "tips") renderTips();
+  else if (S.tab === "wish" && !S.editing) renderWish();
+  else if (S.tab === "ships" && !S.editing) renderShips();
+  else if (S.tab === "links") renderLinks();
+  else if (S.tab === "about") renderAbout();
+  else if (S.tab === "settings" && !S.editing) renderSettings();
+}
+$("rail").addEventListener("click", e => { const b = e.target.closest(".st"); if (b) { S.station = b.dataset.st; closeItem(); render(); } });
+$("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { S.tab = b.dataset.tab; render(); } });
+["q", "ftype", "fsort", "fchanged", "freg", "fspread", "fammo"].forEach(id => $(id).addEventListener("input", () => { if (S.tab !== "items" && S.tab !== "expired") S.tab = "items"; render(); }));
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeItem();
+  if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") { e.preventDefault(); $("q").focus(); }
+});
+document.addEventListener("focusin", e => { S.editing = /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) && e.target.id !== "q"; });
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+load();
+setInterval(() => { if (!S.editing && !document.hidden && !["settings", "wish", "ships"].includes(S.tab)) load(); }, 15000);
+</script>
+</body>
+</html>

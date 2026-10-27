@@ -1,0 +1,7 @@
+rapidocr>=3.10
+onnxruntime>=1.20
+opencv-python-headless>=4.9
+numpy
+rapidfuzz>=3.0
+mss>=9.0
+dxcam>=0.0.5; sys_platform == "win32"

@@ -1,0 +1,18 @@
+# Your data never goes in the repository
+data/
+*.db
+*.csv
+tiles/
+screenshots/
+completeness.txt
+config.json
+/test[0-9]*/
+discarded_*/
+tracker_v2.py
+
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+build/
+dist/
