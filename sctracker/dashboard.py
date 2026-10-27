@@ -70,6 +70,8 @@ def start_server(app, open_browser=False):
                 au["picture"] = f"/img/{au['picture']}" if au.get("picture") else ""
                 return self._send(200, {"author": au, "message": about.MESSAGE, "rules": about.RULES,
                                         "links": [dict(name=n, url=u, about=d) for n, u, d in about.LINKS],
+                                        "wish_intro": about.WISHLIST_INTRO,
+                                        "wishlist": [dict(name=n, maker=m, url=u, why=w) for n, m, u, w in about.WISHLIST],
                                         "version": VERSION})
             if path == "/api/suggest":
                 return self._send(200, suggest(app, qs.get("q", "")))

@@ -483,6 +483,11 @@ dl.kv dt { color: var(--muted); } dl.kv dd { margin: 0; overflow-wrap: anywhere;
 .about .portrait { flex: none; width: 120px; height: 120px; object-fit: cover; border: 1px solid var(--line2); border-radius: 4px; }
 .about ul.alinks { list-style: none; padding: 0; margin: var(--s5) 0 0; border-top: 1px solid var(--line); }
 .about ul.alinks li { margin: 0; padding: var(--s3) 0; border-bottom: 1px solid var(--line); }
+.about ul.shipwish { list-style: none; padding: 0; margin: var(--s3) 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); gap: var(--s2); }
+.about ul.shipwish li { margin: 0; padding: var(--s3); border: 1px solid var(--line); border-radius: 4px; display: grid; gap: 2px; align-content: start; }
+.about ul.shipwish a { font-weight: 700; }
+.about ul.shipwish .mk { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; }
+.about ul.shipwish .why { font-size: .875rem; }
 @media (max-width: 520px) { .about .who { flex-direction: column; } }
 
 /* Toast */
@@ -1023,6 +1028,8 @@ async function renderAbout(tok) {
     ${au.org ? `<p>Org: ${esc(au.org)}</p>` : ""}</div></div>
     <ul class="alinks">${(a.links || []).map(l => `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ${ICON.ext}<span class="sr">(opens in a new tab)</span></a><div class="sub">${esc(l.about)}</div></li>`).join("")}
     ${au.repo ? `<li><a href="${esc(au.repo)}" target="_blank" rel="noopener">Project page, updates and issues ${ICON.ext}<span class="sr">(opens in a new tab)</span></a><div class="sub">Download the latest version, report a bug or suggest an idea.</div></li>` : ""}</ul>
+    ${(a.wishlist || []).length ? `<h3>Ships on my wish list</h3><p class="sub">${esc(a.wish_intro || "")}</p>
+    <ul class="shipwish">${a.wishlist.map(w => `<li><a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.name)} ${ICON.ext}<span class="sr">(opens the RSI store in a new tab)</span></a><span class="mk">${esc(w.maker)}</span><span class="why">${esc(w.why)}</span></li>`).join("")}</ul>` : ""}
     <h3>How it treats your game and your data</h3><ul>${a.rules.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
     <p class="sub">SC Inventory Tracker ${esc(a.version)}</p></div>`;
 }

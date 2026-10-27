@@ -236,7 +236,22 @@ The only thing I ask in return: if you see me in game or in chat, say hi, and if
 <br clear="left">
 
 - [My citizen page on RSI](https://robertsspaceindustries.com/en/citizens/Aurelius_Draco). Add me as a friend or send me a message in game.
-- [New to Star Citizen? Sign up with my referral code STAR-VD9W-346V](https://www.robertsspaceindustries.com/enlist?referral=STAR-VD9W-346V). New players get bonus UEC when they sign up with a referral code.
+- [New to Star Citizen? Sign up with my referral code STAR-VD9W-346V](https://www.robertsspaceindustries.com/enlist?referral=STAR-VD9W-346V). New players get 50,000 UEC to start with when they sign up with a referral code.
+
+### Ships on my wish list
+
+Nobody has to get me anything. But if you're ever feeling generous, these are the ships I'd love to fly. Message me on my RSI page first so we can sort out the gift.
+
+- [Idris-P](https://robertsspaceindustries.com/pledge/ships/aegis-idris/Idris-P) (Aegis Dynamics). A frigate of my own. Dream big.
+- [Polaris](https://robertsspaceindustries.com/pledge/ships/polaris/Polaris) (Roberts Space Industries). A corvette with torpedoes and its own hangar.
+- [Perseus](https://robertsspaceindustries.com/pledge/ships/perseus/Perseus) (Roberts Space Industries). Huge turret cannons on a gunship hull.
+- [890 Jump](https://robertsspaceindustries.com/pledge/ships/890-jump/890-Jump) (Origin Jumpworks). The luxury yacht. Hauling gold in style.
+- [Hammerhead](https://robertsspaceindustries.com/pledge/ships/hammerhead/Hammerhead) (Aegis Dynamics). Turrets on every side.
+- [Ironclad Assault](https://robertsspaceindustries.com/pledge/ships/ironclad/Ironclad-Assault) (Drake Interplanetary). An armoured hauler that hits back.
+- [Reclaimer](https://robertsspaceindustries.com/pledge/ships/reclaimer/Reclaimer) (Aegis Dynamics). Salvage my own construction materials.
+- [600i Explorer](https://robertsspaceindustries.com/pledge/ships/600i/600i-Explorer) (Origin Jumpworks). The comfortable way to see the verse.
+- [Paladin](https://robertsspaceindustries.com/pledge/ships/paladin/Paladin) (Anvil Aerospace). A proper heavy gunship.
+- [Corsair](https://robertsspaceindustries.com/pledge/ships/drake-corsair/Corsair) (Drake Interplanetary). Guns everywhere, built for the frontier.
 
 ## Licence
 

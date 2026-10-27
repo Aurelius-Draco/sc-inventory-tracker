@@ -14,7 +14,34 @@ LINKS = [
      "Add me as a friend or send me a message in game."),
     ("New to Star Citizen? Sign up with my referral code STAR-VD9W-346V",
      "https://www.robertsspaceindustries.com/enlist?referral=STAR-VD9W-346V",
-     "New players get bonus UEC when they sign up with a referral code."),
+     "New players get 50,000 UEC to start with when they sign up with a referral code."),
+]
+
+# Ships on my wish list: (ship, maker, RSI store page, why)
+WISHLIST_INTRO = ("Nobody has to get me anything. But if you're ever feeling generous, these are the ships I'd love to "
+                  "fly. Message me on my RSI page first so we can sort out the gift.")
+WISHLIST = [
+    ("Idris-P", "Aegis Dynamics", "https://robertsspaceindustries.com/pledge/ships/aegis-idris/Idris-P",
+     "A frigate of my own. Dream big."),
+    ("Polaris", "Roberts Space Industries", "https://robertsspaceindustries.com/pledge/ships/polaris/Polaris",
+     "A corvette with torpedoes and its own hangar."),
+    ("Perseus", "Roberts Space Industries", "https://robertsspaceindustries.com/pledge/ships/perseus/Perseus",
+     "Huge turret cannons on a gunship hull."),
+    ("890 Jump", "Origin Jumpworks", "https://robertsspaceindustries.com/pledge/ships/890-jump/890-Jump",
+     "The luxury yacht. Hauling gold in style."),
+    ("Hammerhead", "Aegis Dynamics", "https://robertsspaceindustries.com/pledge/ships/hammerhead/Hammerhead",
+     "Turrets on every side."),
+    ("Ironclad Assault", "Drake Interplanetary",
+     "https://robertsspaceindustries.com/pledge/ships/ironclad/Ironclad-Assault",
+     "An armoured hauler that hits back."),
+    ("Reclaimer", "Aegis Dynamics", "https://robertsspaceindustries.com/pledge/ships/reclaimer/Reclaimer",
+     "Salvage my own construction materials."),
+    ("600i Explorer", "Origin Jumpworks", "https://robertsspaceindustries.com/pledge/ships/600i/600i-Explorer",
+     "The comfortable way to see the verse."),
+    ("Paladin", "Anvil Aerospace", "https://robertsspaceindustries.com/pledge/ships/paladin/Paladin",
+     "A proper heavy gunship."),
+    ("Corsair", "Drake Interplanetary", "https://robertsspaceindustries.com/pledge/ships/drake-corsair/Corsair",
+     "Guns everywhere, built for the frontier."),
 ]
 
 MESSAGE = [
