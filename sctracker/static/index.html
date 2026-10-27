@@ -3,259 +3,786 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Storage Manifest</title>
+<title>Storage manifest</title>
+<script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <style>
 :root {
-  --hull: #1b232d; --panel: #222c37; --raise: #2a3542; --line: #354251;
-  --text: #e4e8ec; --muted: #9aa6b2; --amber: #f0a53a; --teal: #4cb5a8; --rust: #de6f55;
-  --on-amber: #1b232d; --amber-bg: rgba(240,165,58,.12); --teal-bg: rgba(76,181,168,.13); --rust-bg: rgba(222,111,85,.13);
+  color-scheme: dark;
+  --bg: #0a0f15; --panel: #111820; --raise: #17202a; --raise2: #1e2935; --line: #253140; --line2: #3a495b;
+  --text: #e8edf2; --muted: #a3afbc; --amber: #f4ad42; --on-amber: #1b1104; --teal: #4fc7b5; --rust: #ef7d62; --fresh: #b4cde3;
+  --amber-bg: rgba(244,173,66,.11); --amber-line: rgba(244,173,66,.5); --teal-bg: rgba(79,199,181,.12); --rust-bg: rgba(239,125,98,.13); --fresh-bg: rgba(180,205,227,.11);
+  --tick: rgba(180,205,227,.5); --grid: rgba(180,205,227,.035);
+  --shadow: 0 18px 44px rgba(0,0,0,.5); --glow: 0 0 14px rgba(244,173,66,.35);
   --font: "Bahnschrift", "DIN Alternate", "Barlow", "Segoe UI", system-ui, sans-serif;
+  --mono: "Cascadia Mono", "Consolas", ui-monospace, monospace;
+  --field: #0a0f15; --rail: 19rem; --panelw: min(36rem, 100vw);
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --hull: #e9edf1; --panel: #f8fafb; --raise: #ffffff; --line: #cdd5dd;
-    --text: #18202a; --muted: #56616d; --amber: #a86400; --teal: #1d7a70; --rust: #b0452f;
-    --on-amber: #ffffff; --amber-bg: rgba(168,100,0,.10); --teal-bg: rgba(29,122,112,.10); --rust-bg: rgba(176,69,47,.10);
+    color-scheme: light;
+    --bg: #e6ebf0; --panel: #f5f7f9; --raise: #ffffff; --raise2: #edf1f5; --line: #cfd7df; --line2: #a9b5c1;
+    --text: #111922; --muted: #4c5866; --amber: #965800; --on-amber: #ffffff; --teal: #0f7266; --rust: #a63f28; --fresh: #2f5f86;
+    --amber-bg: rgba(150,88,0,.09); --amber-line: rgba(150,88,0,.45); --teal-bg: rgba(15,114,102,.09); --rust-bg: rgba(166,63,40,.09); --fresh-bg: rgba(47,95,134,.09);
+    --tick: rgba(47,95,134,.45); --grid: rgba(47,95,134,.05); --field: #ffffff;
+    --shadow: 0 14px 34px rgba(20,40,60,.18); --glow: 0 0 0 transparent;
   }
 }
 :root[data-theme="light"] {
-  --hull: #e9edf1; --panel: #f8fafb; --raise: #ffffff; --line: #cdd5dd;
-  --text: #18202a; --muted: #56616d; --amber: #a86400; --teal: #1d7a70; --rust: #b0452f;
-  --on-amber: #ffffff; --amber-bg: rgba(168,100,0,.10); --teal-bg: rgba(29,122,112,.10); --rust-bg: rgba(176,69,47,.10);
+  color-scheme: light;
+  --bg: #e6ebf0; --panel: #f5f7f9; --raise: #ffffff; --raise2: #edf1f5; --line: #cfd7df; --line2: #a9b5c1;
+  --text: #111922; --muted: #4c5866; --amber: #965800; --on-amber: #ffffff; --teal: #0f7266; --rust: #a63f28; --fresh: #2f5f86;
+  --amber-bg: rgba(150,88,0,.09); --amber-line: rgba(150,88,0,.45); --teal-bg: rgba(15,114,102,.09); --rust-bg: rgba(166,63,40,.09); --fresh-bg: rgba(47,95,134,.09);
+  --tick: rgba(47,95,134,.45); --grid: rgba(47,95,134,.05); --field: #ffffff;
+  --shadow: 0 14px 34px rgba(20,40,60,.18); --glow: 0 0 0 transparent;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; }
-body { background: var(--hull); color: var(--text); font: 15px/1.45 var(--font); font-variant-numeric: tabular-nums; }
+html { font-size: 16px; }
+html, body { margin: 0; }
+body { min-height: 100vh; color: var(--text); font: .9375rem/1.45 var(--font); font-variant-numeric: tabular-nums;
+  background: radial-gradient(1100px 560px at 12% -8%, var(--fresh-bg), transparent 62%), radial-gradient(900px 480px at 105% -4%, var(--amber-bg), transparent 60%), var(--bg); background-attachment: fixed; }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse at 40% 0%, #000 10%, transparent 75%); mask-image: radial-gradient(ellipse at 40% 0%, #000 10%, transparent 75%); }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-a { color: var(--teal); }
+a { color: var(--teal); text-underline-offset: 3px; }
+a:hover { color: var(--text); }
+h1, h2, h3, h4 { text-wrap: balance; }
+p, li { text-wrap: pretty; }
+code { font: .8125rem var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+small { font-size: .75em; color: var(--muted); font-weight: 500; }
+.sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: -999px; top: 8px; z-index: 60; background: var(--amber); color: var(--on-amber); padding: 8px 14px; font-weight: 600; }
+.skip:focus { left: 12px; }
+[hidden] { display: none !important; }
 
-.shell { display: grid; grid-template-columns: 290px 1fr; min-height: 100vh; }
+/* Panels with corner marks, like a console bezel */
+.frame { position: relative; background: var(--panel); border: 1px solid var(--line); box-shadow: inset 0 1px 0 rgba(255,255,255,.03); }
+.frame::before { content: ""; position: absolute; inset: -1px; pointer-events: none; background-repeat: no-repeat;
+  background-image: linear-gradient(var(--tick), var(--tick)), linear-gradient(var(--tick), var(--tick)), linear-gradient(var(--tick), var(--tick)), linear-gradient(var(--tick), var(--tick)),
+    linear-gradient(var(--tick), var(--tick)), linear-gradient(var(--tick), var(--tick)), linear-gradient(var(--tick), var(--tick)), linear-gradient(var(--tick), var(--tick));
+  background-size: 12px 1px, 1px 12px, 12px 1px, 1px 12px, 12px 1px, 1px 12px, 12px 1px, 1px 12px;
+  background-position: 0 0, 0 0, 100% 0, 100% 0, 0 100%, 0 100%, 100% 100%, 100% 100%; }
+
+/* Layout */
+.shell { display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); min-height: 100vh; }
+main { padding: 22px 32px 90px; min-width: 0; container-type: inline-size; }
+main > :not(.tabbar) { max-width: 100rem; }
 
 /* Station rail */
-.rail { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 0 40px; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
-.brand { padding: 0 20px 18px; }
-.brand h1 { font-size: 22px; font-weight: 700; font-stretch: condensed; letter-spacing: .02em; margin: 0; }
-.brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
-.sys { margin-top: 14px; }
-.sys h2 { font-size: 13px; font-weight: 600; color: var(--muted); margin: 0 20px 4px; }
-.st { display: block; width: 100%; text-align: left; background: none; border: 0; border-left: 3px solid transparent; padding: 7px 20px 8px 17px; }
+.rail { position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column; border-right: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel), color-mix(in srgb, var(--panel) 70%, var(--bg))); scrollbar-width: thin; }
+.brand { display: flex; gap: 12px; align-items: center; padding: 20px 20px 16px; border-bottom: 1px solid var(--line); }
+.mark { flex: none; color: var(--amber); display: grid; }
+.brand h1 { font-size: 1.25rem; font-weight: 700; font-stretch: condensed; letter-spacing: .02em; margin: 0; line-height: 1.1; }
+.brand p { font-size: .75rem; color: var(--muted); margin: 2px 0 0; }
+.stlist { padding: 10px 10px 20px; display: flex; flex-direction: column; gap: 2px; }
+.sys h2 { display: flex; align-items: center; gap: 10px; margin: 16px 10px 6px; font-size: .75rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.sys h2::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.st { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; width: 100%; text-align: left; background: none; border: 1px solid transparent; border-radius: 3px; padding: 9px 10px 9px 12px; }
 .st:hover { background: var(--raise); }
-.st[aria-current="true"] { border-left-color: var(--amber); background: var(--raise); }
-.st .n { display: flex; justify-content: space-between; gap: 8px; }
-.st .n b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.st .n span { color: var(--muted); }
-.fresh { display: block; height: 3px; background: var(--line); margin-top: 6px; border-radius: 2px; overflow: hidden; }
-.fresh i { display: block; height: 100%; background: var(--teal); }
-.fresh.old i { background: var(--amber); }
-.fresh.none i { width: 0 !important; }
-.st small { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; }
-.st small.warn { color: var(--amber); }
+.st[aria-current="true"] { background: var(--raise); border-color: var(--line); }
+.st[aria-current="true"]::before { content: ""; position: absolute; left: -1px; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: var(--amber); box-shadow: var(--glow); }
+.st .nm { font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.st .q { color: var(--muted); font-size: .875rem; text-align: right; }
+.st .fr { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-size: .75rem; color: var(--muted); }
+.st .fr.warn { color: var(--amber); }
+.meter { display: inline-flex; gap: 2px; align-items: flex-end; flex: none; vertical-align: -1px; }
+.meter i { width: 4px; background: var(--line2); border-radius: 1px; }
+.meter i:nth-child(1) { height: 4px; } .meter i:nth-child(2) { height: 6px; } .meter i:nth-child(3) { height: 8px; } .meter i:nth-child(4) { height: 10px; } .meter i:nth-child(5) { height: 12px; }
+.meter i.on { background: var(--fresh); box-shadow: 0 0 6px var(--fresh-bg); }
+.meter.old i.on { background: var(--amber); }
+.rail-foot { margin-top: auto; padding: 14px 20px 18px; border-top: 1px solid var(--line); font-size: .75rem; color: var(--muted); display: grid; gap: 3px; }
+.live { display: flex; align-items: center; gap: 8px; }
+.live i { width: 7px; height: 7px; border-radius: 50%; background: var(--fresh); box-shadow: 0 0 8px var(--fresh); animation: breathe 3.2s ease-in-out infinite; }
+.live.lost { color: var(--amber); } .live.lost i { background: var(--amber); box-shadow: none; }
+.railnote { padding: 6px 12px; font-size: .8125rem; color: var(--muted); }
+@keyframes breathe { 50% { opacity: .35; } }
 
-/* Main */
-main { padding: 26px 34px 60px; min-width: 0; }
-.search { display: flex; align-items: stretch; border: 2px solid var(--line); background: var(--raise); border-radius: 4px; }
-.search label { display: flex; align-items: center; padding: 0 14px; background: var(--amber); color: var(--on-amber); font-weight: 700; font-stretch: condensed; font-size: 15px; }
-.search input { flex: 1; border: 0; background: none; padding: 12px 14px; font-size: 26px; font-stretch: semi-condensed; min-width: 0; }
+/* Search */
+.search { display: flex; align-items: center; gap: 10px; height: 58px; padding: 0 10px 0 16px; background: var(--raise); border: 1px solid var(--line2); transition: border-color .15s, box-shadow .15s; }
+.search:focus-within { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber-line), 0 0 26px rgba(244,173,66,.14); }
+.search > svg { flex: none; color: var(--muted); }
+.search input { flex: 1; min-width: 0; height: 100%; border: 0; background: none; padding: 0; font-size: 1.375rem; font-stretch: semi-condensed; }
+.search input::placeholder { color: var(--muted); }
 .search input:focus { outline: none; }
-.search:focus-within { border-color: var(--amber); }
-.filters { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 12px 0 0; color: var(--muted); font-size: 14px; }
-.filters select { background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 4px 6px; }
-.filters label { display: inline-flex; gap: 6px; align-items: center; }
+input[type="search"]::-webkit-search-cancel-button { display: none; }
+kbd { font: 600 .75rem var(--mono); border: 1px solid var(--line2); border-bottom-width: 2px; border-radius: 3px; padding: 1px 7px; color: var(--muted); }
+.iconbtn { flex: none; display: grid; place-items: center; width: 36px; height: 36px; background: none; border: 0; border-radius: 3px; color: var(--muted); }
+.iconbtn:hover { color: var(--text); background: var(--raise2); }
 
-.needs { margin: 20px 0 0; border: 1px solid var(--amber); background: var(--amber-bg); border-radius: 4px; padding: 12px 16px; }
-.needs h3 { margin: 0 0 6px; font-size: 16px; color: var(--amber); }
-.need { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); }
-.need:first-of-type { border-top: 0; }
-.need p { margin: 0; flex: 1 1 340px; }
-.need select, .need input { background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 4px 6px; }
-.need input { width: 80px; }
+/* Needs you */
+.needs { margin-top: 18px; border-color: var(--amber-line); --tick: var(--amber); background: linear-gradient(90deg, var(--amber-bg), transparent 70%), var(--panel); }
+.needs-h { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 12px 16px; }
+.needs-h h3 { margin: 0; font-size: 1.0625rem; color: var(--amber); }
+.pulse { width: 9px; height: 9px; border-radius: 50%; background: var(--amber); animation: pulse 2.4s ease-out infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(244,173,66,.55); } 70%, 100% { box-shadow: 0 0 0 9px rgba(244,173,66,0); } }
+.need { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); }
+.need p { margin: 0; flex: 1 1 320px; }
+.need .ctl { flex: 0 1 auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.need select { max-width: 100%; min-width: 0; }
+.needs .more { padding: 8px 16px 12px; border-top: 1px solid var(--line); }
 
-.head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; align-items: end; margin: 26px 0 6px; }
-.head h2 { font-size: 30px; font-weight: 700; font-stretch: condensed; margin: 0; line-height: 1.1; }
-.head .facts { color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 18px; }
-.head .facts b { color: var(--text); font-weight: 600; }
-.head .facts .warn { color: var(--amber); }
-.linkish { background: none; border: 0; color: var(--teal); padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+/* Station header */
+.head { margin-top: 18px; padding: 18px 22px 18px; display: grid; gap: 14px; overflow: hidden; }
+.head::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, transparent, var(--fresh-bg) 45%, rgba(180,205,227,.16) 50%, var(--fresh-bg) 55%, transparent); background-size: 40% 100%; background-repeat: no-repeat; }
+.head.sweep::after { animation: sweep 1.1s ease-out; }
+@keyframes sweep { 0% { opacity: 1; background-position: -60% 0; } 100% { opacity: 1; background-position: 160% 0; } }
+.eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: .75rem; color: var(--muted); }
+.eyebrow .sysname { letter-spacing: .16em; text-transform: uppercase; font-weight: 600; color: var(--fresh); }
+.hmain { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 20px; }
+.hmain h2 { font-size: 2rem; font-weight: 700; font-stretch: condensed; margin: 4px 0 0; line-height: 1.05; overflow-wrap: anywhere; }
+.readout { display: flex; flex-wrap: wrap; gap: 14px 30px; margin: 0; }
+.cell { min-width: 0; padding-top: 7px; border-top: 1px solid var(--line2); }
+.cell dt { font-size: .75rem; color: var(--muted); }
+.cell dd { margin: 2px 0 0; font-size: 1.25rem; font-weight: 600; font-stretch: semi-condensed; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.cell.warn dd { color: var(--amber); } .cell.rust dd { color: var(--rust); }
+.cell .sub { white-space: normal; }
+.warns { display: grid; gap: 6px; }
+.notice { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 9px 12px; border: 1px solid var(--amber-line); background: var(--amber-bg); border-radius: 3px; font-size: .875rem; }
+.notice > svg { flex: none; color: var(--amber); margin-top: 2px; }
+.notice b { color: var(--amber); }
+.notice.rust { border-color: var(--rust); background: var(--rust-bg); } .notice.rust > svg, .notice.rust b { color: var(--rust); }
+.rename { margin-top: 10px; padding: 16px 20px; display: grid; gap: 12px; }
+.rh { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.rh h3 { margin: 0 0 2px; font-size: 1.0625rem; }
+.rh p { margin: 0; }
+.placelist { max-height: 300px; overflow-y: auto; border: 1px solid var(--line); max-width: 560px; background: var(--bg); }
+.placelist button { display: flex; justify-content: space-between; gap: 10px; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 8px 12px; }
+.placelist button:hover { background: var(--raise); box-shadow: inset 3px 0 0 var(--amber); }
+.placelist button[aria-current="true"] { color: var(--amber); }
 
-.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-top: 14px; overflow-x: auto; }
-.tabs button { background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 14px 7px; color: var(--muted); white-space: nowrap; }
-.tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--amber); }
+/* Tabs */
+.tabbar { position: sticky; top: 0; z-index: 6; display: flex; gap: 2px; margin: 20px -32px 0; padding: 0 32px; overflow-x: auto; scrollbar-width: none;
+  background: color-mix(in srgb, var(--bg) 86%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.tabbar::-webkit-scrollbar { display: none; }
+.tabbar button { position: relative; flex: none; display: flex; align-items: center; gap: 7px; padding: 14px 13px 12px; background: none; border: 0; color: var(--muted); font-weight: 600; white-space: nowrap; }
+.tabbar button:hover { color: var(--text); }
+.tabbar button[aria-selected="true"] { color: var(--text); }
+.tabbar button[aria-selected="true"]::after { content: ""; position: absolute; left: 9px; right: 9px; bottom: -1px; height: 2px; background: var(--amber); box-shadow: var(--glow); }
+.tabbar button:focus-visible { outline-offset: -4px; }
+.tabbar .t2 { margin-left: auto; }
+.tabbar .t2 ~ button { font-weight: 500; }
+.count { font-size: .75rem; line-height: 1.6; min-width: 22px; padding: 0 6px; text-align: center; border-radius: 10px; background: var(--raise2); color: var(--muted); font-weight: 600; }
+.count.teal { background: var(--teal-bg); color: var(--teal); } .count.rust { background: var(--rust-bg); color: var(--rust); }
+.count:empty { display: none; }
 
-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
-th { text-align: left; font-weight: 600; color: var(--muted); font-size: 13px; padding: 10px 8px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-th button { background: none; border: 0; padding: 0; color: inherit; font-weight: inherit; }
-td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
-tbody tr { cursor: pointer; }
-tbody tr:hover td { background: var(--raise); }
-td.num, th.num { text-align: right; }
-.qty { font-size: 18px; font-weight: 600; }
-.delta { font-size: 12px; margin-left: 4px; }
-.delta.up { color: var(--teal); } .delta.down { color: var(--rust); }
-.chip { display: inline-block; font-size: 12px; padding: 0 6px; border-radius: 3px; margin: 0 4px 0 0; vertical-align: 1px; }
-.chip.reg { background: var(--teal-bg); color: var(--teal); }
-.chip.exp { background: var(--rust-bg); color: var(--rust); }
-.chip.edit { background: var(--amber-bg); color: var(--amber); }
-.chip.tag { border: 1px solid var(--line); color: var(--muted); }
-.sub { color: var(--muted); font-size: 13px; }
-.empty { color: var(--muted); padding: 30px 0; max-width: 60ch; }
+/* Filters */
+.filters { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin: 14px 0 0; }
+.sel { display: inline-flex; align-items: center; gap: 8px; font-size: .875rem; color: var(--muted); }
+select, .inp, .field input, .field textarea, textarea { background: var(--field); border: 1px solid var(--line2); border-radius: 3px; padding: 7px 10px; color: var(--text); min-height: 38px; }
+select { padding-right: 6px; }
+select:focus, .inp:focus, .field input:focus, textarea:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber-line); }
+.chipt { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 4px 13px 4px 10px; border: 1px solid var(--line2); border-radius: 999px; font-size: .875rem; color: var(--muted); cursor: pointer; user-select: none; white-space: nowrap; }
+.chipt:hover { color: var(--text); border-color: var(--amber-line); }
+.chipt input { appearance: none; -webkit-appearance: none; flex: none; width: 15px; height: 15px; margin: 0; border: 1.5px solid var(--line2); border-radius: 3px; background: var(--field); }
+.chipt input:checked { background: var(--amber); border-color: var(--amber); box-shadow: inset 0 0 0 2.5px var(--field); }
+.chipt input:focus { outline: none; }
+.chipt:has(input:checked) { color: var(--text); border-color: var(--amber-line); background: var(--amber-bg); }
+.chipt:has(input:focus-visible) { outline: 2px solid var(--amber); outline-offset: 2px; }
+.fend { margin-left: auto; display: flex; gap: 14px; align-items: center; font-size: .875rem; color: var(--muted); }
 
-.changes li { list-style: none; display: grid; grid-template-columns: 130px 1fr auto; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
-.changes { padding: 0; margin: 8px 0; }
-.changes time { color: var(--muted); }
-.tips { max-width: 75ch; }
-.tips h3 { margin: 24px 0 6px; font-size: 18px; }
-.tips li { margin: 6px 0; }
-.settings label { display: flex; gap: 10px; align-items: flex-start; margin: 14px 0; max-width: 70ch; }
-.settings input[type=text] { background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 4px 8px; width: 320px; max-width: 100%; }
-.btn { background: var(--amber); color: var(--on-amber); border: 0; border-radius: 3px; padding: 6px 14px; font-weight: 600; }
-.btn.quiet { background: var(--raise); color: var(--text); border: 1px solid var(--line); }
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 7px 16px; border: 1px solid var(--amber); border-radius: 3px; background: var(--amber); color: var(--on-amber); font-weight: 600; white-space: nowrap; transition: box-shadow .15s, filter .15s; }
+.btn:hover { box-shadow: var(--glow); filter: brightness(1.06); }
+.btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; filter: none; }
+.btn.ghost { background: var(--raise); color: var(--text); border-color: var(--line2); }
+.btn.ghost:hover { border-color: var(--amber); box-shadow: none; }
+.btn.sm { min-height: 32px; padding: 4px 12px; font-size: .875rem; }
+.link { background: none; border: 0; padding: 2px 0; color: var(--teal); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-align: left; }
+.link:hover { color: var(--text); }
+.link.danger { color: var(--rust); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line2); border-radius: 3px; overflow: hidden; }
+.seg button { background: var(--raise); border: 0; border-left: 1px solid var(--line2); padding: 6px 12px; color: var(--muted); font-weight: 600; font-size: .875rem; min-height: 34px; }
+.seg button:first-child { border-left: 0; }
+.seg button[aria-pressed="true"] { background: var(--raise2); color: var(--text); box-shadow: inset 0 -2px 0 var(--amber); }
+.seg button:focus-visible { outline-offset: -3px; }
 
-.wish h3 { margin: 26px 0 4px; font-size: 20px; font-stretch: condensed; }
-.wish td input { width: 64px; background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 2px 6px; }
-.wish tr.got td { color: var(--muted); }
-.wish tbody tr { cursor: default; }
-.need-n { color: var(--amber); font-weight: 600; }
-.have-n { color: var(--teal); font-weight: 600; }
-.addwish { margin-top: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; max-width: 900px; }
-.addwish textarea, .addwish input { width: 100%; background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 6px 8px; }
-.addwish textarea { min-height: 110px; grid-row: span 3; }
-.links-list li { margin: 8px 0; list-style: none; }
-.links-list { padding: 0; }
-.about { max-width: 70ch; }
-.about .lead { font-size: 19px; }
-@media (max-width: 860px) { .addwish { grid-template-columns: 1fr; } }
+/* Tables */
+.tablewrap { margin-top: 12px; }
+.tscroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: .8125rem; font-weight: 600; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line2); background: var(--raise); white-space: nowrap; }
+th button { display: inline-flex; align-items: center; gap: 4px; background: none; border: 0; padding: 0; color: inherit; font: inherit; }
+th button:hover, th[aria-sort] button { color: var(--text); }
+th .arr { color: var(--amber); font-size: .7rem; }
+td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tbody tr:last-child td { border-bottom: 0; }
+tr.row { cursor: pointer; }
+table.items thead th { position: sticky; top: var(--tabh, 49px); z-index: 2; border-bottom: 0; padding-top: 12px; padding-bottom: 12px;
+  background: var(--panel); color: var(--fresh); font-size: .875rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  box-shadow: inset 0 -2px 0 var(--amber), 0 4px 10px rgba(0,0,0,.18); }
+table.items thead th button:hover, table.items thead th[aria-sort] button { color: var(--text); }
+table.items td { padding: 12px 14px; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); vertical-align: middle; }
+table.items th { padding-left: 14px; padding-right: 14px; }
+table.items tr.row td:first-child { box-shadow: inset 3px 0 0 transparent; transition: box-shadow .12s; }
+table.items tr.row.alt td { background: color-mix(in srgb, var(--raise) 55%, transparent); }
+tr.row:hover td { background: var(--raise2) !important; }
+table.items tr.row:hover td:first-child { box-shadow: inset 3px 0 0 var(--amber-line); }
+.c-qty { width: 1%; }
+.c-qty .delta { display: block; width: max-content; margin: 4px 0 0 auto; }
+.c-qty .qty { display: inline-block; min-width: 3.2em; padding: 2px 8px; border: 1px solid var(--line2); border-radius: 3px; background: var(--field); text-align: right; }
+.c-val { width: 1%; }
+.val { font-weight: 600; font-size: 1rem; }
+.val small, .vsm small { color: var(--muted); }
+.each { display: block; font-size: .75rem; color: var(--muted); margin-top: 1px; }
+.noval { color: var(--line2); }
+.vsm { margin-top: 4px; }
+tr.gh th { position: static; padding: 0; background: var(--bg); border: 0; white-space: normal; }
+tr.gh th > .ghbar { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-top: 18px; padding: 10px 14px 9px 16px; position: relative;
+  background: linear-gradient(90deg, var(--fresh-bg), transparent 75%), var(--raise2); border-top: 1px solid var(--line2); border-bottom: 1px solid var(--line2); }
+tr.gh th > .ghbar::before { content: ""; position: absolute; left: 0; top: -1px; bottom: -1px; width: 4px; background: var(--fresh); }
+tr.gh:first-child th > .ghbar { margin-top: 0; border-top: 0; }
+.ghn { font-size: 1.0625rem; font-weight: 700; font-stretch: condensed; color: var(--text); letter-spacing: .02em; }
+.ghm { font-size: .8125rem; font-weight: 500; color: var(--muted); }
+tr.row.sel td, table.items tr.row.sel.alt td { background: var(--amber-bg); }
+tr.row.sel td:first-child { box-shadow: inset 3px 0 0 var(--amber); }
+.iname { background: none; border: 0; padding: 0; text-align: left; font-weight: 600; font-size: 1rem; color: var(--text); overflow-wrap: anywhere; }
+.iname:hover { color: var(--amber); }
+.num { text-align: right; white-space: nowrap; }
+th.num button { flex-direction: row-reverse; }
+.qty { font-size: 1.125rem; font-weight: 600; }
+.delta { display: inline-block; margin-left: 6px; padding: 0 5px; border-radius: 3px; font-size: .75rem; font-weight: 600; vertical-align: 2px; }
+.delta.up { color: var(--teal); background: var(--teal-bg); } .delta.down { color: var(--rust); background: var(--rust-bg); }
+.chip { display: inline-flex; align-items: center; font-size: .75rem; line-height: 1.55; padding: 0 7px; border-radius: 3px; font-weight: 600; white-space: nowrap; }
+.chip.reg { color: var(--fresh); background: var(--fresh-bg); }
+.chip.exp { color: var(--rust); background: var(--rust-bg); }
+.chip.edit { color: var(--amber); background: var(--amber-bg); }
+.chip.log { color: var(--teal); background: var(--teal-bg); }
+.chip.tag { color: var(--muted); border: 1px solid var(--line2); font-weight: 500; }
+.sub { color: var(--muted); font-size: .8125rem; }
+.meta { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; margin-top: 4px; }
+.show-sm, .show-md { display: none; }
+.c-st { min-width: 160px; }
+.tfoot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; margin: 12px 2px 0; }
+.intro { color: var(--muted); max-width: 75ch; margin: 18px 0 0; }
+/* Empty states */
+.empty { margin-top: 14px; padding: 46px 24px; text-align: center; border: 1px dashed var(--line2); color: var(--muted); }
+.empty h3 { margin: 14px 0 6px; color: var(--text); font-size: 1.125rem; }
+.empty p { margin: 0 auto; max-width: 56ch; }
+.eacts { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 16px; }
+.ering { display: inline-block; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line2); position: relative;
+  background: radial-gradient(circle, var(--fresh) 0 2px, transparent 3px), conic-gradient(from 0deg, var(--fresh-bg), transparent 30%); }
+.ering::after { content: ""; position: absolute; inset: 9px; border-radius: 50%; border: 1px dashed var(--line2); }
 
-.addone { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; margin-top: 18px; max-width: 1000px; position: relative; }
-.field { display: flex; flex-direction: column; gap: 3px; flex: 1 1 240px; position: relative; }
-.field.small { flex: 0 0 110px; }
-.field label { font-size: 13px; color: var(--muted); }
-.field input { background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 7px 9px; width: 100%; }
-.sugg { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 4; background: var(--raise); border: 1px solid var(--line); border-radius: 0 0 4px 4px; max-height: 340px; overflow-y: auto; box-shadow: 0 10px 24px rgba(0,0,0,.3); }
-.sugg button { display: flex; justify-content: space-between; gap: 12px; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 7px 10px; }
-.sugg button:hover, .sugg button:focus { background: var(--panel); }
-.howto { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--teal); border-radius: 3px; padding: 10px 16px; margin: 10px 0; max-width: 900px; }
-.howto h4 { margin: 12px 0 4px; font-size: 15px; }
-.howto h4:first-child { margin-top: 2px; }
-.howto p { margin: 4px 0; }
-.howto ul { margin: 4px 0; padding-left: 20px; }
-.howto ul.spots { padding-left: 0; }
-.paste { margin-top: 14px; max-width: 700px; }
-.paste summary { cursor: pointer; color: var(--teal); }
-.paste textarea { width: 100%; min-height: 100px; background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 6px 8px; margin: 8px 0; }
-td.actions { white-space: nowrap; text-align: right; }
-.howrow td, .optrow td { background: none !important; cursor: default; }
-.ship { margin-top: 28px; }
-.shiphead { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
-.shiphead h3 { margin: 0; font-size: 22px; font-stretch: condensed; }
-.ship tbody tr { cursor: default; }
-.ship > .btn { margin-top: 10px; }
-.placelist { max-height: 300px; overflow-y: auto; border: 1px solid var(--line); border-radius: 3px; margin-top: 8px; max-width: 520px; }
-.placelist button { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 6px 10px; }
-.placelist button:hover { background: var(--raise); }
+/* Changes */
+.day { margin-top: 18px; }
+.day h3 { margin: 0 0 6px; font-size: .8125rem; font-weight: 600; color: var(--muted); letter-spacing: .04em; }
+.chgs { list-style: none; margin: 0; padding: 0; }
+.chg { display: grid; grid-template-columns: 64px 72px minmax(0, 1fr) auto; gap: 4px 14px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); }
+.chg:last-child { border-bottom: 0; }
+.chg time { font: .8125rem var(--mono); color: var(--muted); }
+.dl { font-weight: 700; font-size: 1.0625rem; text-align: right; }
+.dl.up { color: var(--teal); } .dl.down { color: var(--rust); }
+.chg .what { min-width: 0; display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: baseline; }
+.chg .src { display: flex; gap: 10px; align-items: center; justify-content: flex-end; }
 
 /* Item panel */
-.drawer { position: fixed; top: 0; right: 0; height: 100vh; width: min(520px, 100vw); background: var(--panel); border-left: 1px solid var(--line); box-shadow: -12px 0 30px rgba(0,0,0,.25); transform: translateX(100%); transition: transform .18s ease-out; overflow-y: auto; padding: 22px 26px 50px; z-index: 5; }
-.drawer.open { transform: none; }
-.drawer h2 { margin: 0 34px 2px 0; font-size: 26px; font-stretch: condensed; line-height: 1.15; }
-.drawer .close { position: absolute; top: 16px; right: 18px; background: none; border: 0; font-size: 26px; line-height: 1; color: var(--muted); }
-.drawer h3 { font-size: 15px; margin: 24px 0 8px; color: var(--muted); font-weight: 600; }
-.bigqty { display: flex; align-items: baseline; gap: 14px; margin-top: 14px; }
-.bigqty b { font-size: 46px; font-weight: 700; line-height: 1; }
-.form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.form input, .form textarea { background: var(--raise); border: 1px solid var(--line); border-radius: 3px; padding: 5px 8px; }
-.form input[type=number] { width: 90px; }
-.form .grow { flex: 1 1 200px; }
-.form textarea { width: 100%; min-height: 60px; resize: vertical; }
-dl.grid { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0; }
-dl.grid dt { color: var(--muted); }
-dl.grid dd { margin: 0; }
-.spots li { list-style: none; padding: 4px 0; display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); }
-.spots { padding: 0; margin: 0; }
-.cmp td, .cmp th { padding: 4px 6px; font-size: 13px; }
-.cmp tr.this td { color: var(--amber); font-weight: 600; }
-.cmp tbody tr { cursor: default; }
-.hist li { list-style: none; padding: 5px 0; border-bottom: 1px solid var(--line); display: flex; gap: 10px; justify-content: space-between; }
-.hist { padding: 0; margin: 0; }
+.drawer { position: fixed; top: 0; right: 0; z-index: 20; width: var(--panelw); height: 100vh; overflow-y: auto; overscroll-behavior: contain; background: var(--panel); border-left: 1px solid var(--line2); box-shadow: var(--shadow);
+  transform: translateX(102%); visibility: hidden; transition: transform .24s cubic-bezier(.2,.8,.2,1), visibility 0s linear .24s; }
+.drawer.open { transform: none; visibility: visible; transition: transform .24s cubic-bezier(.2,.8,.2,1); }
+.scrim { position: fixed; inset: 0; z-index: 19; background: rgba(3,7,11,.55); opacity: 0; pointer-events: none; transition: opacity .2s; }
+.scrim.show { opacity: 1; pointer-events: auto; }
+.dh { position: sticky; top: 0; z-index: 2; padding: 18px 60px 14px 24px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.dh::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: linear-gradient(90deg, var(--amber), transparent 40%); opacity: .7; }
+.dh h2 { margin: 4px 0 2px; font-size: 1.625rem; font-stretch: condensed; line-height: 1.1; overflow-wrap: anywhere; }
+.dh h2:focus { outline: none; }
+.dh .close { position: absolute; top: 12px; right: 12px; }
+.db { padding: 0 24px 48px; }
+.blk { padding: 18px 0; border-bottom: 1px solid var(--line); }
+.blk:last-child { border-bottom: 0; }
+.blk > h3, .det > summary { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 0 0 10px; font-size: .8125rem; font-weight: 600; color: var(--muted); letter-spacing: .03em; }
+.big { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+.big b { font-size: 3rem; font-weight: 700; line-height: 1; font-stretch: semi-condensed; }
+.big span { color: var(--muted); }
+.blk p { margin: 8px 0 0; }
+.form { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-top: 12px; }
+.field { display: flex; flex-direction: column; gap: 5px; position: relative; min-width: 0; }
+.field > label, .field > span { font-size: .8125rem; font-weight: 600; color: var(--muted); }
+.field.n { flex: 0 0 110px; } .field.grow { flex: 1 1 200px; }
+.field textarea { min-height: 70px; resize: vertical; width: 100%; }
+.warnt { color: var(--amber); }
+.spots { list-style: none; margin: 0; padding: 0; }
+.spots li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 14px; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+.spots li:last-child { border-bottom: 0; }
+.spots .pl { display: block; overflow-wrap: anywhere; }
+.spots b { text-align: right; font-size: 1rem; white-space: nowrap; }
+.stale { color: var(--amber); }
+dl.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 5px 18px; margin: 0; }
+dl.kv dt { color: var(--muted); } dl.kv dd { margin: 0; overflow-wrap: anywhere; }
+.det > summary { cursor: pointer; list-style: none; margin: 0; }
+.det > summary::-webkit-details-marker { display: none; }
+.det > summary::after { content: "Show"; color: var(--teal); text-decoration: underline; text-underline-offset: 3px; }
+.det[open] > summary { margin-bottom: 10px; } .det[open] > summary::after { content: "Hide"; }
+.cmp td, .cmp th { padding: 6px 8px; font-size: .8125rem; }
+.cmp th { background: none; }
+.cmp tr.this td { color: var(--amber); font-weight: 600; background: var(--amber-bg); }
+.bar { display: block; height: 3px; margin-top: 4px; background: var(--line); border-radius: 2px; overflow: hidden; min-width: 40px; }
+.bar i { display: block; height: 100%; background: var(--fresh); }
+.hist { list-style: none; margin: 0; padding: 0; }
+.hist li { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+.hist li:last-child { border-bottom: 0; }
 
-.toast { position: fixed; bottom: 22px; left: 50%; transform: translate(-50%, 20px); background: var(--text); color: var(--hull); padding: 9px 18px; border-radius: 4px; opacity: 0; transition: .2s; pointer-events: none; z-index: 9; }
+/* Add forms, suggestions */
+.addcard { margin-top: 16px; padding: 18px 20px; }
+.addcard > h3 { margin: 0 0 12px; font-size: 1.0625rem; }
+.addrow { display: grid; grid-template-columns: minmax(0, 2fr) 110px minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+.addrow.two { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto; }
+.addcard .sub { margin: 10px 0 0; }
+.sugg { position: absolute; top: 100%; left: 0; min-width: min(440px, calc(100vw - 40px)); width: 100%; z-index: 10; margin-top: 4px; max-height: 340px; overflow-y: auto; background: var(--raise); border: 1px solid var(--line2); box-shadow: var(--shadow); }
+.sugg [role="option"] { display: flex; justify-content: space-between; gap: 14px; padding: 9px 12px; border-bottom: 1px solid var(--line); cursor: pointer; }
+.sugg [role="option"]:hover, .sugg [aria-selected="true"] { background: var(--raise2); box-shadow: inset 3px 0 0 var(--amber); }
+.sugg .none { padding: 10px 12px; color: var(--muted); }
+.preview { margin-top: 14px; padding: 14px 16px; background: var(--bg); border: 1px solid var(--line); }
+.preview > h4 { margin: 0 0 8px; font-size: 1.0625rem; }
+.paste { margin-top: 14px; }
+.paste summary { cursor: pointer; color: var(--teal); font-weight: 600; width: fit-content; white-space: nowrap; }
+.paste textarea { display: block; width: 100%; max-width: 640px; min-height: 110px; margin: 8px 0 10px; }
+
+/* How to get it */
+.how { display: grid; gap: 10px; }
+.how > p { margin: 0; }
+.havel { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.routes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+.route { padding: 12px 14px; background: var(--raise); border: 1px solid var(--line); border-top: 2px solid var(--fresh); }
+.route.off { border-top-color: var(--line2); background: transparent; }
+.route.off h4 { color: var(--muted); }
+.route h4 { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 10px; margin: 0 0 6px; font-size: .9375rem; }
+.rtag { font-size: .8125rem; font-weight: 500; color: var(--muted); }
+.route p { margin: 4px 0; }
+.route ul.missions { margin: 6px 0; padding-left: 18px; }
+.route ul.missions li { margin: 5px 0; }
+.shiplist { display: flex; flex-wrap: wrap; gap: 5px; }
+
+/* Wish list */
+.wl { margin-top: 18px; }
+.wlh { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 16px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.wlh h3 { margin: 0; font-size: 1.25rem; font-stretch: condensed; overflow-wrap: anywhere; }
+.wlh p { margin: 2px 0 0; }
+.prog { flex: 0 0 180px; height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--teal); }
+.wr { display: grid; grid-template-columns: minmax(0, 1.6fr) 84px 96px minmax(0, 1.2fr) auto; gap: 8px 14px; align-items: center; padding: 10px 18px; border-bottom: 1px solid var(--line); }
+.wr.wrh { padding-top: 8px; padding-bottom: 8px; background: var(--raise); font-size: .8125rem; font-weight: 600; color: var(--muted); }
+.wn { display: flex; gap: 8px; align-items: flex-start; min-width: 0; }
+.wn > span { display: grid; min-width: 0; overflow-wrap: anywhere; }
+.wn svg { flex: none; color: var(--teal); margin-top: 3px; }
+.wr.got .wn b { color: var(--muted); font-weight: 600; }
+.wr .inp { width: 76px; text-align: right; min-height: 34px; padding: 4px 8px; }
+.need-n { color: var(--amber); font-weight: 700; } .have-n { color: var(--teal); font-weight: 700; }
+.acts { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: flex-end; }
+.howbox { padding: 14px 18px 18px; background: var(--bg); border-bottom: 1px solid var(--line); }
+
+/* Ships */
+.ship { margin-top: 18px; }
+.shiph { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; padding: 12px 18px; }
+.shiptoggle { display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 4px 0; text-align: left; min-width: 0; }
+.shiptoggle .chev { flex: none; color: var(--muted); transition: transform .15s; }
+.shiptoggle[aria-expanded="true"] .chev { transform: rotate(90deg); color: var(--amber); }
+.shipname { display: block; font-size: 1.375rem; font-weight: 700; font-stretch: condensed; line-height: 1.15; overflow-wrap: anywhere; }
+.shipmeta { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
+.grp { border-top: 1px solid var(--line); }
+.grp > h4 { margin: 0; padding: 10px 18px 8px; font-size: .8125rem; font-weight: 600; color: var(--fresh); letter-spacing: .04em; background: var(--raise); }
+.slot { display: grid; grid-template-columns: minmax(130px, 1fr) 48px minmax(0, 1.7fr) 86px minmax(150px, auto) 64px; gap: 6px 14px; align-items: center; padding: 10px 18px; border-top: 1px solid var(--line); }
+.slot.slh { padding-top: 7px; padding-bottom: 7px; font-size: .75rem; font-weight: 600; color: var(--muted); border-top: 0; }
+.slot.mine { box-shadow: inset 3px 0 0 var(--amber); }
+.sf { min-width: 0; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+.sf .fname { font-weight: 600; overflow-wrap: anywhere; }
+.sf .sub { flex-basis: 100%; }
+.size { font: 600 .75rem var(--mono); padding: 1px 6px; border: 1px solid var(--line2); border-radius: 3px; color: var(--muted); }
+.sa { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; justify-content: flex-end; }
+.sw { display: flex; justify-content: flex-end; align-items: center; gap: 6px; cursor: pointer; }
+.sw input { width: 18px; height: 18px; accent-color: var(--amber); margin: 0; }
+.sm-only { display: none; }
+.opts { padding: 14px 18px 16px; background: var(--bg); border-top: 1px solid var(--line); }
+.opth { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 16px; align-items: center; margin-bottom: 10px; }
+.opth h4 { margin: 0; font-size: 1rem; }
+.optf { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.olist { border: 1px solid var(--line); background: var(--panel); }
+.orow { display: grid; grid-template-columns: minmax(140px, 1.5fr) minmax(100px, 1fr) 64px 64px 84px 64px minmax(190px, auto); gap: 6px 14px; align-items: center; padding: 9px 12px; border-top: 1px solid var(--line); font-size: .875rem; }
+.olist.has-main .orow { grid-template-columns: minmax(140px, 1.5fr) minmax(100px, 1fr) 90px 64px 64px 84px 64px minmax(190px, auto); }
+.orow.ohead { border-top: 0; background: var(--raise); font-size: .75rem; font-weight: 600; color: var(--muted); padding-top: 7px; padding-bottom: 7px; }
+.orow.this { background: var(--amber-bg); box-shadow: inset 3px 0 0 var(--amber); }
+.orow.this .on b { color: var(--amber); }
+.orow .on { min-width: 0; overflow-wrap: anywhere; }
+.sm-lbl { display: none; }
+.ohow { padding: 14px 16px; background: var(--bg); border-top: 1px solid var(--line); }
+.shipfoot { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 12px 18px 14px; border-top: 1px solid var(--line); }
+.pad { padding: 14px 18px; margin: 0; }
+
+/* Tips, links, settings, about */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 14px; margin-top: 16px; }
+.card { padding: 16px 20px 14px; }
+.card h3 { display: flex; gap: 10px; align-items: baseline; margin: 0 0 6px; font-size: 1.0625rem; }
+.idx { font: 600 .8125rem var(--mono); color: var(--amber); }
+.card ul { margin: 0; padding-left: 18px; }
+.card li { margin: 7px 0; line-height: 1.5; }
+.card li::marker { color: var(--line2); }
+.linkl { list-style: none; padding: 0 !important; }
+.linkl li { padding: 8px 0; border-bottom: 1px dashed var(--line); margin: 0 !important; }
+.linkl li:last-child { border-bottom: 0; }
+.linkl a { font-weight: 600; display: inline-flex; gap: 6px; align-items: center; }
+.setgrid { display: grid; gap: 14px; max-width: 880px; margin-top: 16px; }
+.set { padding: 16px 20px; }
+.set > h3 { margin: 0 0 4px; font-size: 1.0625rem; }
+.set > p { margin: 0 0 6px; }
+.opt { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; align-items: start; padding: 12px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.opt b { display: block; font-weight: 600; }
+.switch { appearance: none; -webkit-appearance: none; position: relative; width: 40px; height: 22px; margin: 1px 0 0; border-radius: 11px; background: var(--line2); transition: background .15s; cursor: pointer; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--text); transition: left .15s; }
+.switch:checked { background: var(--amber); } .switch:checked::after { left: 21px; background: var(--on-amber); }
+.switch:focus { outline: none; } .switch:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.savebar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+.about { max-width: 72ch; margin-top: 16px; padding: 22px 26px; }
+.about h3 { margin: 22px 0 8px; font-size: 1.0625rem; } .about h3:first-child { margin-top: 0; }
+.about .lead { font-size: 1.1875rem; color: var(--text); }
+.about ul { padding-left: 18px; } .about li { margin: 6px 0; }
+
+/* Toast */
+.toast { position: fixed; left: 50%; bottom: 24px; z-index: 40; max-width: min(560px, calc(100vw - 32px)); padding: 10px 18px; border: 1px solid var(--line2); border-left: 3px solid var(--teal); border-radius: 3px; background: var(--raise2); color: var(--text); box-shadow: var(--shadow);
+  opacity: 0; transform: translate(-50%, 16px); transition: opacity .2s, transform .2s; pointer-events: none; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.err { border-left-color: var(--rust); }
 
-@media (max-width: 860px) {
-  .shell { grid-template-columns: 1fr; }
-  .rail { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
-  .rail .list { display: flex; overflow-x: auto; gap: 4px; padding: 0 16px; }
-  .sys { margin-top: 0; display: contents; }
-  .sys h2 { display: none; }
-  .st { min-width: 180px; border-left: 0; border-bottom: 3px solid transparent; padding: 6px 10px; }
-  .st[aria-current="true"] { border-bottom-color: var(--amber); }
-  main { padding: 18px 16px 50px; }
-  .search input { font-size: 20px; }
-  .hide-sm { display: none; }
-  .changes li { grid-template-columns: 1fr auto; }
-  .changes time { grid-column: 1 / -1; }
+/* Wide screens: the item panel docks beside the list instead of covering it */
+@media (min-width: 1500px) {
+  .shell.has-panel { grid-template-columns: var(--rail) minmax(0, 1fr) min(36rem, 32vw); }
+  .shell.has-panel .drawer { position: sticky; top: 0; grid-column: 3; grid-row: 1; width: auto; transform: none; visibility: visible; box-shadow: none; transition: none; }
+  .drawer:not(.open) { display: none; }
+  .scrim { display: none; }
 }
-@media (prefers-reduced-motion: reduce) { .drawer, .toast { transition: none; } }
+@media (min-width: 2200px) { html { font-size: 18px; } }
+@media (min-width: 3000px) { html { font-size: 21px; } }
+
+/* Narrow screens */
+@media (max-width: 900px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
+  .brand { padding: 14px 16px 10px; border-bottom: 0; }
+  .stlist { flex-direction: row; overflow-x: auto; gap: 6px; padding: 2px 16px 14px; scroll-snap-type: x proximity; scrollbar-width: thin; }
+  .sys { display: contents; } .sys h2 { display: none; }
+  .st { flex: 0 0 min(230px, 70vw); scroll-snap-align: start; border-color: var(--line); background: var(--panel); }
+  .st[aria-current="true"]::before { left: 10px; right: 10px; top: auto; bottom: -1px; width: auto; height: 2px; }
+  .rail-foot { display: none; }
+  main { padding: 16px 16px 70px; }
+  .tabbar { margin: 18px -16px 0; padding: 0 12px; }
+  .search { height: 52px; } .search input { font-size: 1.125rem; }
+  .search kbd { display: none; }
+  .head { padding: 16px; } .hmain h2 { font-size: 1.625rem; }
+  .readout { gap: 12px 22px; }
+  .filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-left: -16px; margin-right: -16px; padding: 2px 16px 4px; }
+  .filters::-webkit-scrollbar { display: none; }
+  .filters > * { flex: none; }
+  .fend { margin-left: 0; }
+  .db { padding: 0 18px 40px; } .dh { padding: 16px 56px 12px 18px; }
+}
+@container (max-width: 700px) { .hide-md { display: none; } .show-md { display: block; } }
+@container (max-width: 760px) {
+  .addrow, .addrow.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .addrow .wide { grid-column: 1 / -1; }
+  .addrow .btn { grid-column: 1 / -1; }
+  .wr { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "n q h" "w w w" "a a a"; padding: 12px 16px; }
+  .wr.wrh { display: none; }
+  .wn { grid-area: n; } .wq { grid-area: q; } .wh { grid-area: h; } .wwhere { grid-area: w; } .wr .acts { grid-area: a; justify-content: flex-start; }
+  .slot { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "p s" "f f" "h w" "a a"; padding: 12px 16px; }
+  .slot.slh { display: none; }
+  .sp { grid-area: p; } .ss { grid-area: s; } .sf { grid-area: f; } .sh { grid-area: h; text-align: left; } .sw { grid-area: w; } .sa { grid-area: a; justify-content: flex-start; }
+  main .sm-only { display: inline; }
+  .chg { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "d w s" "t w s"; padding: 10px 12px; }
+  .chg time { grid-area: t; } .chg .dl { grid-area: d; text-align: left; } .chg .what { grid-area: w; } .chg .src { grid-area: s; }
+}
+@container (max-width: 480px) {
+  .chg { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "d w" "t w" "s s"; }
+  .chg .src { justify-content: flex-start; }
+}
+@container (max-width: 520px) { .hide-sm { display: none; } .show-sm { display: block; } td, th { padding-left: 8px; padding-right: 8px; } }
+
+@container (max-width: 760px) {
+  .olist .orow, .olist.has-main .orow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .orow .on, .orow .acts { grid-column: 1 / -1; }
+  .orow .acts { justify-content: flex-start; }
+  .orow .num { text-align: left; }
+  .olist .ohead { display: none; }
+  main .sm-lbl { display: block; color: var(--muted); font-size: .75rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+<style id="theme-orbital">
+/* Demo 2: "Orbital" theme. Layered over the base styles; layout and behaviour are unchanged. */
+:root, :root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #090c22; --panel: #11153a; --raise: #181d49; --raise2: #222a5e; --line: #2a3168; --line2: #46508f;
+  --text: #f7f0e2; --muted: #b9b7d4; --amber: #ffb22e; --on-amber: #1d1033; --teal: #41e2c6; --rust: #ff7360; --fresh: #95b7ff;
+  --amber-bg: rgba(255,178,46,.13); --amber-line: rgba(255,178,46,.55); --teal-bg: rgba(65,226,198,.12); --rust-bg: rgba(255,115,96,.14); --fresh-bg: rgba(149,183,255,.12);
+  --field: #0b0f2b; --tick: transparent; --grid: transparent; --star: rgba(255,250,235,.85); --star2: rgba(170,195,255,.7);
+  --shadow: 0 24px 60px rgba(2,3,15,.6); --glow: 0 0 18px rgba(255,178,46,.5); --cosmos: .8;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #f3ead8; --panel: #fbf5ea; --raise: #fffaf2; --raise2: #f1e6d1; --line: #e2d4bb; --line2: #c2ae8d;
+    --text: #1a1c40; --muted: #55557a; --amber: #9a5000; --on-amber: #ffffff; --teal: #00766a; --rust: #b3341f; --fresh: #3447a6;
+    --amber-bg: rgba(154,80,0,.09); --amber-line: rgba(154,80,0,.45); --teal-bg: rgba(0,118,106,.09); --rust-bg: rgba(179,52,31,.09); --fresh-bg: rgba(52,71,166,.08);
+    --field: #fffdf8; --star: rgba(26,28,64,.22); --star2: rgba(52,71,166,.18); --shadow: 0 18px 40px rgba(60,40,10,.14); --glow: 0 0 0 transparent; --cosmos: .38;
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3ead8; --panel: #fbf5ea; --raise: #fffaf2; --raise2: #f1e6d1; --line: #e2d4bb; --line2: #c2ae8d;
+  --text: #1a1c40; --muted: #55557a; --amber: #9a5000; --on-amber: #ffffff; --teal: #00766a; --rust: #b3341f; --fresh: #3447a6;
+  --amber-bg: rgba(154,80,0,.09); --amber-line: rgba(154,80,0,.45); --teal-bg: rgba(0,118,106,.09); --rust-bg: rgba(179,52,31,.09); --fresh-bg: rgba(52,71,166,.08);
+  --field: #fffdf8; --star: rgba(26,28,64,.22); --star2: rgba(52,71,166,.18); --shadow: 0 18px 40px rgba(60,40,10,.14); --glow: 0 0 0 transparent; --cosmos: .38;
+}
+
+/* Sky: drifting stars and a ringed planet behind everything */
+body { background: radial-gradient(1300px 700px at 88% -18%, var(--fresh-bg), transparent 62%), radial-gradient(900px 620px at -8% 112%, var(--rust-bg), transparent 60%), var(--bg); background-attachment: fixed; }
+body::before, body::after { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; -webkit-mask-image: none; mask-image: none; background-size: 360px 360px; }
+body::before { background-image:
+  radial-gradient(circle at 24px 36px, var(--star) 0 1px, transparent 1.6px), radial-gradient(circle at 132px 88px, var(--star2) 0 1px, transparent 1.6px),
+  radial-gradient(circle at 210px 170px, var(--star) 0 1.3px, transparent 2px), radial-gradient(circle at 318px 44px, var(--star2) 0 .8px, transparent 1.4px),
+  radial-gradient(circle at 74px 250px, var(--star) 0 .9px, transparent 1.5px), radial-gradient(circle at 280px 300px, var(--star2) 0 1px, transparent 1.6px),
+  radial-gradient(circle at 170px 330px, var(--star) 0 .7px, transparent 1.3px);
+  animation: drift 260s linear infinite; }
+body::after { background-size: 560px 560px; opacity: .7; background-image:
+  radial-gradient(circle at 60px 120px, var(--star) 0 1.6px, transparent 2.4px), radial-gradient(circle at 400px 60px, var(--star2) 0 1.2px, transparent 2px),
+  radial-gradient(circle at 300px 420px, var(--star) 0 1.4px, transparent 2.2px), radial-gradient(circle at 500px 300px, var(--star2) 0 1px, transparent 1.8px);
+  animation: drift2 420s linear infinite, twinkle 7s ease-in-out infinite; }
+@keyframes drift { to { background-position: 360px 0; } }
+@keyframes drift2 { to { background-position: 560px 0; } }
+@keyframes twinkle { 50% { opacity: .35; } }
+.cosmos { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; opacity: var(--cosmos); }
+.planet { position: absolute; width: 640px; height: 640px; right: -200px; top: -260px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 72%, #ffd38a 0%, #ff9a5c 22%, #e2546a 44%, #6a2b86 68%, #20144a 88%);
+  box-shadow: 0 0 120px rgba(255,140,100,.35), inset -40px -30px 80px rgba(10,6,40,.55); }
+.planet::after { content: ""; position: absolute; inset: 0; border-radius: 50%; opacity: .25; mix-blend-mode: soft-light;
+  background: repeating-linear-gradient(-18deg, transparent 0 22px, rgba(255,255,255,.6) 22px 30px, transparent 30px 52px); background-size: 200% 100%; animation: bands 90s linear infinite; }
+@keyframes bands { to { background-position: -200% 0; } }
+.ring { position: absolute; width: 1180px; height: 220px; right: -470px; top: -40px; border-radius: 50%; transform: rotate(-16deg);
+  border: 2px solid rgba(255,205,160,.45); box-shadow: 0 0 0 10px rgba(255,205,160,.06), 0 0 0 22px rgba(255,205,160,.04); }
+.ring::after { content: ""; position: absolute; inset: 26px 70px; border-radius: 50%; border: 1px dashed rgba(149,183,255,.45); }
+.moon { position: absolute; width: 22px; height: 22px; border-radius: 50%; right: 520px; top: 120px; background: radial-gradient(circle at 35% 35%, #fff4dc, #b9b7d4 60%, #4b4a7a); box-shadow: 0 0 18px rgba(255,240,210,.4); animation: bob 14s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translate(-14px, 10px); } }
+
+/* Panels */
+.frame { border-radius: 16px; border-color: var(--line); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  background: linear-gradient(180deg, color-mix(in srgb, color-mix(in srgb, var(--raise) 55%, var(--panel)) 80%, transparent), color-mix(in srgb, var(--panel) 84%, transparent)); box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 30px rgba(2,3,15,.18); }
+.frame::before { display: none; }
+.iname::after { content: "\203A"; display: inline-block; margin-left: 6px; color: var(--amber); opacity: 0; transform: translateX(-4px); transition: opacity .15s, transform .15s; }
+tr.row:hover .iname::after, .iname:focus-visible::after { opacity: 1; transform: none; }
+
+/* Rail */
+.rail { background: color-mix(in srgb, var(--panel) 86%, transparent); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.mark { width: 36px; height: 36px; position: relative; }
+.mark svg { display: none; }
+.mark::before { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffe3a1, var(--amber) 40%, var(--rust) 85%); box-shadow: 0 0 14px rgba(255,178,46,.45); }
+.mark::after { content: ""; position: absolute; left: -6px; right: -6px; top: 13px; height: 10px; border-radius: 50%; border: 2px solid var(--fresh); transform: rotate(-20deg); border-bottom-color: transparent; }
+.brand h1 { font-size: 1.375rem; letter-spacing: .03em; }
+.sys h2 { color: var(--text); letter-spacing: .2em; }
+.sys h2::before { content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--fresh); box-shadow: 0 0 0 3px var(--panel), 0 0 0 4px var(--line2); }
+.sys[aria-label="Stanton"] h2::before { background: radial-gradient(circle at 35% 35%, #fff2c8, #ffb22e 60%, #c76a10); }
+.sys[aria-label="Pyro"] h2::before { background: radial-gradient(circle at 35% 35%, #ffd0b0, #ff7360 60%, #9c2b22); }
+.sys[aria-label="Nyx"] h2::before { background: radial-gradient(circle at 35% 35%, #e4d8ff, #9a7bff 60%, #4a2fa0); }
+.st { border-radius: 12px; padding: 10px 12px 10px 14px; }
+.st:hover { background: var(--raise); }
+.st[aria-current="true"] { background: linear-gradient(90deg, var(--amber-bg), transparent 85%), var(--raise); border-color: var(--amber-line); }
+.st[aria-current="true"]::before { left: -1px; top: 10px; bottom: 10px; width: 4px; border-radius: 0 4px 4px 0; }
+.meter i { border-radius: 2px; }
+.rail-foot { border-top-color: var(--line); }
+
+/* Search */
+.search { height: 62px; padding: 0 14px 0 22px; border-radius: 999px; border: 1.5px solid var(--line2); background: var(--field); box-shadow: 0 8px 30px rgba(2,3,15,.25); }
+.search:focus-within { border-color: var(--amber); box-shadow: 0 0 0 4px var(--amber-bg), 0 0 34px rgba(255,178,46,.22); }
+.search input { font-size: 1.5rem; }
+kbd { border-radius: 6px; }
+.iconbtn { border-radius: 999px; }
+
+/* Needs you: hazard band on top */
+.needs { border-radius: 16px; overflow: hidden; }
+.needs::before { display: block; inset: 0 0 auto 0; height: 5px; background: repeating-linear-gradient(-45deg, var(--amber) 0 10px, transparent 10px 20px); opacity: .9; }
+.needs-h { padding-top: 16px; }
+
+/* Station header: orbit rings with a moon going round */
+.head { border-radius: 22px; padding: 22px 26px; background: radial-gradient(520px 260px at 100% 100%, var(--fresh-bg), transparent 70%), linear-gradient(180deg, color-mix(in srgb, var(--raise) 78%, transparent), color-mix(in srgb, var(--panel) 84%, transparent)); }
+.head::before { display: block; inset: auto -110px -170px auto; width: 380px; height: 380px; border-radius: 50%; opacity: .9;
+  background: radial-gradient(circle at 50% 4.5%, var(--amber) 0 5px, transparent 6px), repeating-radial-gradient(circle, transparent 0 34px, var(--line2) 34px 35px);
+  animation: orbit 50s linear infinite; }
+@keyframes orbit { to { transform: rotate(360deg); } }
+.hmain, .readout, .warns { position: relative; z-index: 1; }
+.hmain h2 { font-size: 2.5rem; letter-spacing: .01em; }
+.eyebrow .sysname { color: var(--amber); }
+.readout { gap: 10px; }
+.cell { padding: 9px 16px 10px; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb, var(--field) 70%, transparent); }
+.cell dt { text-transform: uppercase; letter-spacing: .1em; font-size: .6875rem; font-weight: 600; }
+.cell dd { font-size: 1.375rem; }
+.notice { border-radius: 12px; }
+.rename { border-radius: 16px; }
+.placelist, .sugg { border-radius: 12px; }
+
+/* Tabs as pills */
+.tabbar { gap: 6px; padding-top: 10px; padding-bottom: 10px; background: color-mix(in srgb, var(--bg) 82%, transparent); }
+.tabbar button { padding: 8px 16px; border-radius: 999px; border: 1px solid transparent; }
+.tabbar button:hover { background: var(--raise); border-color: var(--line); }
+.tabbar button[aria-selected="true"] { background: var(--amber); color: var(--on-amber); box-shadow: var(--glow); }
+.tabbar button[aria-selected="true"]::after { display: none; }
+.tabbar button[aria-selected="true"] .count { background: rgba(0,0,0,.18); color: var(--on-amber); }
+.tabbar button:focus-visible { outline-offset: 2px; }
+
+/* Controls */
+select, .inp, .field input, .field textarea, textarea { border-radius: 10px; }
+.btn { border-radius: 999px; padding-left: 20px; padding-right: 20px; box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
+.btn:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,.35), var(--glow); }
+.btn.ghost { box-shadow: none; }
+.seg { border-radius: 999px; }
+.seg button[aria-pressed="true"] { background: var(--amber); color: var(--on-amber); box-shadow: none; }
+.chip { border-radius: 999px; padding: 0 9px; }
+
+/* Items table */
+.tablewrap { border-radius: 18px; }
+table.items thead th { background: var(--raise); }
+table.items thead th:first-child { border-top-left-radius: 17px; }
+table.items thead th:last-child { border-top-right-radius: 17px; }
+table.items tr.row.alt td { background: color-mix(in srgb, var(--raise) 45%, transparent); }
+tr.row:hover td { background: linear-gradient(90deg, var(--amber-bg), transparent 70%), var(--raise) !important; }
+.c-qty .qty { border-radius: 999px; padding: 2px 12px; }
+tr.gh th > .ghbar { margin: 16px 10px 4px; padding: 9px 16px 9px 40px; border: 1px solid var(--line); border-radius: 999px; background: linear-gradient(90deg, var(--fresh-bg), transparent 80%), var(--raise2); }
+tr.gh:first-child th > .ghbar { margin-top: 10px; border-top: 1px solid var(--line); }
+tr.gh th > .ghbar::before { left: 15px; top: 50%; bottom: auto; width: 12px; height: 12px; margin-top: -6px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, var(--fresh) 60%); box-shadow: 0 0 0 3px var(--raise2), 0 0 0 4px var(--fresh); }
+.ghn { font-size: 1.125rem; }
+
+/* Changes, wish list, ships, cards */
+.chgs { border-radius: 16px; }
+.route { border-radius: 14px; border-top-width: 3px; }
+.preview, .howbox { border-radius: 14px; }
+.howbox { margin: 0 12px 10px; border: 1px solid var(--line); }
+.prog { border-radius: 999px; height: 7px; } .prog i { background: linear-gradient(90deg, var(--teal), var(--fresh)); border-radius: 999px; }
+.wl, .ship, .card, .set, .about, .addcard { border-radius: 18px; }
+/* keep suggestion lists above the cards that follow (backdrop-filter makes each card its own layer) */
+.addcard, .field:focus-within { position: relative; z-index: 8; }
+.grp > h4 { background: transparent; color: var(--amber); }
+.shipname { font-size: 1.5rem; }
+.opts { border-radius: 0 0 14px 14px; }
+.olist { border-radius: 14px; overflow: hidden; }
+.size { border-radius: 999px; }
+.idx { display: inline-grid; place-items: center; min-width: 30px; height: 22px; padding: 0 8px; border-radius: 999px; background: var(--amber); color: var(--on-amber); }
+
+/* Item panel */
+.drawer { border-radius: 24px 0 0 24px; border-left: 1px solid var(--line2); }
+.dh { border-radius: 24px 0 0 0; background: radial-gradient(420px 150px at 100% 0%, var(--rust-bg), transparent 70%), radial-gradient(380px 140px at 0% 0%, var(--fresh-bg), transparent 70%), var(--panel); }
+.dh::after { height: 2px; background: linear-gradient(90deg, var(--amber), var(--rust) 40%, transparent 80%); opacity: 1; }
+.big b { font-size: 3.5rem; background: linear-gradient(180deg, var(--text), color-mix(in srgb, var(--text) 60%, var(--amber))); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.scrim { background: rgba(5,4,25,.6); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+
+/* Empty state: a little ringed planet */
+.empty { border-radius: 18px; border-style: dashed; }
+.ering { width: 54px; height: 54px; border: 0; background: radial-gradient(circle at 34% 30%, #ffe3a1, var(--amber) 38%, var(--rust) 80%); box-shadow: 0 0 24px rgba(255,178,46,.35); }
+.ering::after { inset: auto; left: -18px; right: -18px; top: 20px; height: 14px; border: 2px solid var(--fresh); border-radius: 50%; transform: rotate(-18deg); border-bottom-color: transparent; }
+
+/* Toast */
+.toast { border-radius: 999px; border-left: 1px solid var(--line2); padding: 11px 22px 11px 38px; }
+.toast::before { content: ""; position: absolute; left: 16px; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 10px var(--teal); }
+.toast.err::before { background: var(--rust); box-shadow: 0 0 10px var(--rust); }
+@media (max-width: 900px) { .planet { width: 380px; height: 380px; right: -170px; top: -230px; } .ring { width: 700px; right: -330px; top: -120px; } .moon { display: none; } .hmain h2 { font-size: 1.875rem; } .drawer { border-radius: 0; } .dh { border-radius: 0; } }
+@media (prefers-reduced-motion: reduce) { .head::before, .planet::after, .moon { animation: none !important; } }
 </style>
 </head>
 <body>
-<div class="shell">
+<div class="cosmos" aria-hidden="true"><div class="ring"></div><div class="planet"></div><div class="moon"></div></div>
+<a class="skip" href="#view">Skip to the list</a>
+<div class="shell" id="shell">
   <aside class="rail" aria-label="Stations">
-    <div class="brand"><h1>Storage manifest</h1><p>SC Inventory Tracker __VERSION__</p></div>
-    <div class="list" id="rail"></div>
-  </aside>
-  <main>
-    <div class="search">
-      <label for="q">Find</label>
-      <input id="q" type="search" placeholder="Item, maker, type or tag" autocomplete="off">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"><svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.6"><polygon points="17,2 30,9.5 30,24.5 17,32 4,24.5 4,9.5"/><rect x="11" y="12" width="12" height="10"/><path d="M11 17h12"/></svg></span>
+      <div><h1>Storage manifest</h1><p>SC Inventory Tracker <span id="ver">__VERSION__</span></p></div>
     </div>
-    <div class="filters">
-      <label>Type <select id="ftype"><option value="">Any</option></select></label>
-      <label>Sort <select id="fsort">
-        <option value="name">Name</option><option value="qty">Quantity</option>
-        <option value="value">Value</option><option value="changed">Recently changed</option>
-      </select></label>
-      <label><input type="checkbox" id="fchanged"> Changed since scan</label>
-      <label><input type="checkbox" id="freg"> Registered to you</label>
-      <label><input type="checkbox" id="fspread"> At more than one station</label>
-      <label><input type="checkbox" id="fammo" checked> Hide magazines and batteries</label>
+    <nav class="stlist" id="rail" aria-label="Choose a station"></nav>
+    <div class="rail-foot" id="railfoot"></div>
+  </aside>
+  <main id="main">
+    <div class="search" role="search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <label class="sr" for="q">Find an item</label>
+      <input id="q" type="search" placeholder="Find an item, maker, type, tag or note" autocomplete="off" spellcheck="false">
+      <button class="iconbtn" id="qclear" type="button" aria-label="Clear search" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      <kbd title="Press / from anywhere to search">/</kbd>
     </div>
     <div id="needs"></div>
-    <div class="head" id="head"></div>
-    <div class="tabs" role="tablist" id="tabs">
-      <button role="tab" data-tab="items" aria-selected="true">Items</button>
-      <button role="tab" data-tab="changes">Changes</button>
-      <button role="tab" data-tab="expired">Expired</button>
-      <button role="tab" data-tab="wish">Wish list</button>
-      <button role="tab" data-tab="ships">Ships</button>
-      <button role="tab" data-tab="tips">Tips</button>
-      <button role="tab" data-tab="links">Links</button>
-      <button role="tab" data-tab="settings">Settings</button>
-      <button role="tab" data-tab="about">About</button>
+    <div class="head frame" id="head"></div>
+    <div class="tabbar" role="tablist" id="tabs" aria-label="Sections">
+      <button role="tab" id="tab-items" data-tab="items" aria-controls="view" aria-selected="true">Items <span class="count" id="c-items"></span></button>
+      <button role="tab" id="tab-changes" data-tab="changes" aria-controls="view" aria-selected="false" tabindex="-1">Changes <span class="count teal" id="c-changes"></span></button>
+      <button role="tab" id="tab-expired" data-tab="expired" aria-controls="view" aria-selected="false" tabindex="-1">Expired <span class="count rust" id="c-expired"></span></button>
+      <button role="tab" id="tab-wish" data-tab="wish" aria-controls="view" aria-selected="false" tabindex="-1">Wish list <span class="count" id="c-wish"></span></button>
+      <button role="tab" id="tab-ships" data-tab="ships" aria-controls="view" aria-selected="false" tabindex="-1">Ships</button>
+      <button role="tab" id="tab-tips" data-tab="tips" aria-controls="view" aria-selected="false" tabindex="-1" class="t2">Tips</button>
+      <button role="tab" id="tab-links" data-tab="links" aria-controls="view" aria-selected="false" tabindex="-1">Links</button>
+      <button role="tab" id="tab-settings" data-tab="settings" aria-controls="view" aria-selected="false" tabindex="-1">Settings</button>
+      <button role="tab" id="tab-about" data-tab="about" aria-controls="view" aria-selected="false" tabindex="-1">About</button>
     </div>
-    <section id="view" aria-live="polite"></section>
+    <div class="filters" id="filters">
+      <label class="sel">Type <select id="ftype"><option value="">Any</option></select></label>
+      <label class="sel">Sort by <select id="fsort">
+        <option value="name">Name</option><option value="qty">Quantity</option><option value="value">Value</option>
+        <option value="changed">Recently changed</option><option value="station">Station</option><option value="type" selected>Type</option>
+      </select></label>
+      <label class="chipt"><input type="checkbox" id="fchanged"> Changed since the scan</label>
+      <label class="chipt"><input type="checkbox" id="freg"> Registered to you</label>
+      <label class="chipt"><input type="checkbox" id="fspread"> At more than one station</label>
+      <label class="chipt"><input type="checkbox" id="fammo" checked> Hide magazines and batteries</label>
+      <div class="fend"><span id="fcount" aria-live="polite"></span><button class="link" id="fclear" type="button" hidden>Clear filters</button></div>
+    </div>
+    <section id="view" role="tabpanel" aria-labelledby="tab-items" tabindex="-1"></section>
   </main>
+  <aside class="drawer" id="drawer" aria-labelledby="dtitle" inert></aside>
 </div>
-<aside class="drawer" id="drawer" aria-label="Item" aria-hidden="true"></aside>
-<div class="toast" id="toast" role="status"></div>
+<div class="scrim" id="scrim"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 
 <script>
 const TOKEN = "__TOKEN__";
-const S = { model: null, station: "", tab: "items", sort: "name", open: null, tips: null, settings: null, editing: false };
+const S = { model: null, station: "", tab: "items", sort: "type", dir: 1, open: null, opener: null, tips: null, settings: null, links: null, about: null, ships: null,
+  editing: false, viewTok: 0, last: "", shipOpen: {}, opt: {}, optCache: {}, want: {}, wishOpen: {}, howCache: {}, needSel: {}, needsAll: false, wishList: "", rows: [] };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const fmt = (n) => n == null ? "" : Math.round(n).toLocaleString();
+const fmt = (n) => n == null || n === "" ? "" : Math.round(n).toLocaleString();
+const signed = (n) => (n > 0 ? "+" : n < 0 ? "\u2212" : "") + fmt(Math.abs(n));
+const plural = (n, one, many) => `${fmt(n)} ${n === 1 ? one : (many || one + "s")}`;
 const ago = (ts) => {
   if (!ts) return "";
-  const d = (Date.now() / 1000 - ts) / 86400;
-  if (d < 1 / 24) return "just now";
-  if (d < 1) return `${Math.round(d * 24)} h ago`;
-  if (d < 2) return "yesterday";
-  return `${Math.round(d)} days ago`;
+  const m = (Date.now() / 1000 - ts) / 60;
+  if (m < 2) return "just now";
+  if (m < 60) return `${Math.round(m)} min ago`;
+  if (m < 1440) return `${Math.round(m / 60)} h ago`;
+  if (m < 2880) return "yesterday";
+  return `${Math.round(m / 1440)} days ago`;
 };
 const when = (ts) => new Date(ts * 1000).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
-const HIDE_AMMO = /^(magazine|battery)$/i;
+const clock = (ts) => new Date(ts * 1000).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+const dayLabel = (ts) => {
+  const d = new Date(ts * 1000), t = new Date(); t.setHours(0, 0, 0, 0);
+  const diff = Math.round((t - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5);
+  if (diff === 0) return "Today"; if (diff === 1) return "Yesterday";
+  return d.toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+};
+const daysSince = (s) => { const t = Date.parse(s); return isNaN(t) ? null : (Date.now() - t) / 864e5; };
+const prettyDate = (s) => { const t = Date.parse(s); return isNaN(t) ? s : new Date(t).toLocaleDateString(undefined, { day: "numeric", month: "short" }); };
+const HIDE_AMMO = /^(magazine|battery|bat)$/i;
+const SYS_ORDER = ["Stanton", "Pyro", "Nyx"];
+const ICON = {
+  x: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+  warn: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>`,
+  check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>`,
+  chev: `<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>`,
+  ext: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></svg>`
+};
+const emptyState = (t, p, a = "") => `<div class="empty"><span class="ering" aria-hidden="true"></span><h3>${t}</h3><p>${p}</p>${a ? `<div class="eacts">${a}</div>` : ""}</div>`;
+const readout = (cells) => `<dl class="readout">${cells.map(([l, v, t, tone]) => `<div class="cell${tone ? " " + tone : ""}"${t ? ` title="${esc(t)}"` : ""}><dt>${l}</dt><dd>${v}</dd></div>`).join("")}</dl>`;
+const notice = (b, t, cls = "") => `<p class="notice ${cls}">${ICON.warn}<span><b>${b}</b> ${t}</span></p>`;
+const isTyping = () => { const a = document.activeElement; return !!a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable); };
+const dockMQ = window.matchMedia("(min-width: 1500px)");
 
 async function api(path, body) {
   const opt = { headers: { "X-Token": TOKEN } };
@@ -265,47 +792,91 @@ async function api(path, body) {
   if (!r.ok) throw new Error(j.error || "Request failed");
   return j;
 }
-function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2600); }
-async function post(path, body) {
-  try { const j = await api(path, body); S.model = j.model; toast(j.message); render(); return true; }
-  catch (e) { toast(e.message); return false; }
+function toast(msg, err) {
+  const t = $("toast"); t.textContent = msg; t.classList.toggle("err", !!err); t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), err ? 5000 : 2800);
 }
-async function load() {
-  try { S.model = await api("/api/model"); render(); }
-  catch (e) { $("view").innerHTML = `<p class="empty">Can't reach the tracker. Is it still running? (${esc(e.message)})</p>`; }
+const problem = (e) => e instanceof TypeError ? "Can't reach the tracker. Check it's still running, then try again." : e.message;
+async function post(path, body) {
+  try {
+    const j = await api(path, body);
+    if (j.model) { S.model = j.model; S.last = JSON.stringify(j.model); }
+    S.howCache = {};
+    toast(j.message || "Saved."); render(); return true;
+  } catch (e) { toast(problem(e), true); return false; }
+}
+async function load(auto) {
+  try {
+    const m = await api("/api/model");
+    const sig = JSON.stringify(m);
+    renderFoot(true, m);
+    if (auto && sig === S.last) return;
+    const first = !S.model;
+    S.last = sig; S.model = m; render(auto);
+    if (!first) { const h = $("head"); h.classList.remove("sweep"); void h.offsetWidth; h.classList.add("sweep"); }
+    if (auto && S.open && !$("drawer").contains(document.activeElement)) refreshOpen();
+  } catch (e) {
+    if (S.model) { renderFoot(false, S.model); return; }
+    $("view").innerHTML = emptyState("Can't reach the tracker", `Check the tracker window is still open, then reload this page. <span class="sub">(${esc(e.message)})</span>`, `<button class="btn" type="button" onclick="location.reload()">Reload the page</button>`);
+  }
+}
+function renderFoot(ok, m) {
+  const gen = Date.parse(m.generated);
+  $("railfoot").innerHTML = `<div class="live${ok ? "" : " lost"}"><i aria-hidden="true"></i>${ok ? `Up to date${isNaN(gen) ? "" : `, ${clock(gen / 1000)}`}` : "Lost touch with the tracker. Retrying..."}</div>
+    ${m.game_version ? `<div>Game version ${esc(m.game_version)}</div>` : ""}`;
 }
 
-/* ---------- rail ---------- */
+/* ---------- stations ---------- */
+const freshLevel = (age) => age == null ? 0 : age < 1 ? 5 : age < 3 ? 4 : age < 7 ? 3 : age < 14 ? 2 : 1;
+const meter = (age) => { const l = freshLevel(age); return `<span class="meter${age > 7 ? " old" : ""}" aria-hidden="true">${[1, 2, 3, 4, 5].map(k => `<i class="${k <= l ? "on" : ""}"></i>`).join("")}</span>`; };
+function stationNote(s) {
+  const sc = s.scan;
+  if (!sc) return { warn: true, text: "Not scanned yet, log changes only" };
+  if (sc.before_patch) return { warn: true, text: "Scanned before the last patch" };
+  if (s.untracked_changes) return { warn: true, text: "Changed outside the log, rescan" };
+  if (sc.repeat_warning) return { warn: true, text: "Kiosk listed items twice, rescan" };
+  if (!sc.complete) return { warn: true, text: "Scan not finished" };
+  return { warn: s.age_days > 7, text: `Scanned ${ago(sc.last)}` };
+}
+function systems() {
+  const by = {};
+  for (const s of S.model.stations) (by[s.system || "Other"] ||= []).push(s);
+  const rank = (k) => { const i = SYS_ORDER.indexOf(k); return i < 0 ? 99 : i; };
+  return Object.entries(by).sort((a, b) => rank(a[0]) - rank(b[0]) || a[0].localeCompare(b[0]));
+}
 function renderRail() {
-  const m = S.model, bySys = {};
-  for (const s of m.stations) (bySys[s.system || "Other"] ||= []).push(s);
-  const total = m.items.reduce((a, i) => a + i.qty, 0);
-  let h = `<div class="sys"><button class="st" data-st="" aria-current="${S.station === ""}">
-      <span class="n"><b>All stations</b><span>${fmt(total)}</span></span><small>${m.stations.length} ${m.stations.length === 1 ? "station" : "stations"}</small></button></div>`;
-  for (const [sys, list] of Object.entries(bySys)) {
-    h += `<div class="sys"><h2>${esc(sys)}</h2>`;
+  const m = S.model, total = m.items.reduce((a, i) => a + i.qty, 0);
+  let h = `<button class="st" type="button" data-st="" data-fk="st:" aria-current="${S.station === ""}">
+    <span class="nm">All stations</span><span class="q">${fmt(total)}</span><span class="fr">${plural(m.stations.length, "station")}</span></button>`;
+  for (const [sys, list] of systems()) {
+    h += `<div class="sys" role="group" aria-label="${esc(sys)}"><h2>${esc(sys)}</h2>`;
     for (const s of list) {
-      const age = s.age_days, pct = age == null ? 0 : Math.max(6, 100 - age * 7);
-      const note = !s.scan ? "Not scanned, log changes only" : s.scan.before_patch ? "Scanned before the last patch" : s.untracked_changes ? "Changed outside the log, rescan" :
-        s.scan.repeat_warning ? "Kiosk listed items twice, rescan" : !s.scan.complete ? "Scan incomplete" :
-        `Scanned ${ago(s.scan.last)}`;
-      const warn = !s.scan || s.scan.before_patch || s.untracked_changes || s.scan.repeat_warning || !s.scan.complete;
-      h += `<button class="st" data-st="${esc(s.key)}" title="${esc(s.key)}" aria-current="${S.station === s.key}">
-        <span class="n"><b>${esc(s.name)}</b><span>${fmt(s.qty)}</span></span>
-        <span class="fresh ${age == null ? "none" : age > 7 ? "old" : ""}"><i style="width:${pct}%"></i></span>
-        <small class="${warn ? "warn" : ""}">${esc(note)}</small></button>`;
+      const n = stationNote(s);
+      h += `<button class="st" type="button" data-st="${esc(s.key)}" data-fk="st:${esc(s.key)}" aria-current="${S.station === s.key}" title="${esc(s.name)}">
+        <span class="nm">${esc(s.name)}</span><span class="q"><span class="sr">Items: </span>${fmt(s.qty)}</span>
+        <span class="fr${n.warn ? " warn" : ""}">${meter(s.age_days)}<span>${esc(n.text)}</span></span></button>`;
     }
     h += `</div>`;
   }
+  if (!m.stations.length) h += `<p class="railnote">Stations appear here after your first scan.</p>`;
   $("rail").innerHTML = h;
 }
 
 /* ---------- filters ---------- */
-function filtered() {
+const SORTS = {
+  name: [(a, b) => a.name.localeCompare(b.name), 1],
+  qty: [(a, b) => S.tab === "expired" ? a.expired - b.expired : a.qty - b.qty, -1],
+  value: [(a, b) => (a.value || 0) - (b.value || 0), -1],
+  changed: [(a, b) => (a.last_change || 0) - (b.last_change || 0), -1],
+  station: [(a, b) => (a.location || "").localeCompare(b.location || "") || a.name.localeCompare(b.name), 1],
+  type: [(a, b) => (a.item_type || "\uffff").localeCompare(b.item_type || "\uffff") || a.name.localeCompare(b.name), 1]
+};
+function filtered(station = S.station, bare = false) {
   const q = $("q").value.trim().toLowerCase(), type = $("ftype").value;
-  let rows = S.model.items.filter(i => !S.station || i.location_key === S.station);
+  let rows = S.model.items.filter(i => !station || i.location_key === station);
   if (S.tab === "expired") rows = rows.filter(i => i.expired > 0);
   else rows = rows.filter(i => i.qty > 0 || i.changed);
+  if (bare) return rows;
   if ($("fammo").checked && S.tab !== "expired") rows = rows.filter(i => !HIDE_AMMO.test(i.item_type || ""));
   if (type) rows = rows.filter(i => (i.item_type || "Unknown") === type);
   if ($("fchanged").checked) rows = rows.filter(i => i.changed);
@@ -313,15 +884,21 @@ function filtered() {
   if ($("fspread").checked) rows = rows.filter(i => i.also_at.length);
   if (q) rows = rows.filter(i => [i.name, i.manufacturer, i.item_type, i.item_class, i.location, i.note, ...(i.tags || [])]
       .some(v => (v || "").toLowerCase().includes(q)));
-  const s = $("fsort").value;
-  const by = { name: (a, b) => a.name.localeCompare(b.name), qty: (a, b) => b.qty - a.qty,
-    value: (a, b) => (b.value || 0) - (a.value || 0), changed: (a, b) => (b.last_change || 0) - (a.last_change || 0) }[s];
-  return rows.sort(by);
+  const [by, d] = SORTS[S.sort] || SORTS.name;
+  return rows.sort((a, b) => by(a, b) * d * S.dir || a.name.localeCompare(b.name));
+}
+const filtersActive = () => !!($("q").value.trim() || $("ftype").value || $("fchanged").checked || $("freg").checked || $("fspread").checked);
+function clearFilters() {
+  $("q").value = ""; $("qclear").hidden = true; $("ftype").value = "";
+  ["fchanged", "freg", "fspread"].forEach(id => $(id).checked = false);
+  render();
 }
 function fillTypes() {
-  const sel = $("ftype"), cur = sel.value;
-  const types = [...new Set(S.model.items.map(i => i.item_type || "Unknown"))].sort();
-  sel.innerHTML = `<option value="">Any</option>` + types.map(t => `<option ${t === cur ? "selected" : ""}>${esc(t)}</option>`).join("");
+  const sel = $("ftype"), cur = sel.value, n = {};
+  for (const i of S.model.items) if ((!S.station || i.location_key === S.station) && i.qty > 0) { const t = i.item_type || "Unknown"; n[t] = (n[t] || 0) + 1; }
+  const types = Object.keys(n).sort();
+  if (cur && !n[cur]) { types.push(cur); n[cur] = 0; }
+  sel.innerHTML = `<option value="">Any</option>` + types.map(t => `<option value="${esc(t)}" ${t === cur ? "selected" : ""}>${esc(t)} (${n[t]})</option>`).join("");
 }
 
 /* ---------- header ---------- */
@@ -329,429 +906,803 @@ function renderHead() {
   const m = S.model;
   if (!S.station) {
     const value = m.items.reduce((a, i) => a + (i.value || 0), 0);
-    const kinds = m.items.filter(i => i.qty > 0).length;
-    $("head").innerHTML = `<h2>Everything you have stored</h2><div class="facts">
-      <span><b>${fmt(kinds)}</b> different items</span><span><b>${m.stations.length}</b> ${m.stations.length === 1 ? "station" : "stations"}</span>
-      ${value ? `<span>Worth about <b>${fmt(value)}</b> aUEC at best known sell prices</span>` : ""}</div>`;
+    const kinds = m.items.filter(i => i.qty > 0).length, total = m.items.reduce((a, i) => a + i.qty, 0);
+    const oldest = m.stations.filter(s => s.age_days != null && s.scan).sort((a, b) => b.age_days - a.age_days)[0];
+    const unscanned = m.stations.filter(s => !s.scan).length;
+    const cells = [["Different items", fmt(kinds)], ["In storage", fmt(total)], ["Stations", fmt(m.stations.length)]];
+    if (value) cells.push(["Worth about", `${fmt(value)} <small>aUEC</small>`, "At the best sell prices players have reported"]);
+    if (oldest) cells.push(["Oldest scan", `${meter(oldest.age_days)} ${ago(oldest.scan.last)}`, oldest.name, oldest.age_days > 7 ? "warn" : ""]);
+    $("head").innerHTML = `<div class="hmain"><div><div class="eyebrow">Every station</div><h2>Everything you have stored</h2></div></div>${readout(cells)}
+      ${unscanned ? `<div class="warns">${notice(`${plural(unscanned, "station")} not scanned yet.`, "Their counts come from the game log only. Scan them next time you're there.")}</div>` : ""}`;
     return;
   }
   const s = m.stations.find(x => x.key === S.station);
   if (!s) { S.station = ""; return renderHead(); }
-  const sc = s.scan;
-  const facts = [];
+  const sc = s.scan, warns = [], cells = [];
   if (sc) {
-    facts.push(`<span>Scanned <b>${ago(sc.last)}</b></span>`);
-    facts.push(`<span><b>${fmt(sc.identified)}</b>${sc.total ? ` of ${fmt(sc.total)}` : ""} tiles identified</span>`);
-    if (!sc.complete) facts.push(`<span class="warn">Scan not complete</span>`);
-    if (sc.newer_partial) facts.push(`<span class="warn">A newer, unfinished scan exists</span>`);
-    if (sc.before_patch) facts.push(`<span class="warn">Scanned before the current game version. Rescan after patches.</span>`);
-    if (sc.repeat_warning) facts.push(`<span class="warn">The kiosk listed some items twice. Reopen it and rescan.</span>`);
-  } else facts.push(`<span class="warn">Not scanned yet. Showing only changes from the game log.</span>`);
-  if (s.changes) facts.push(`<span><b>${s.changes}</b> changes since</span>`);
-  if (s.untracked_changes) facts.push(`<span class="warn">Storage changed in ways the log can't show (freight elevator?). Rescan to be sure.</span>`);
-  if (s.value) facts.push(`<span>Worth about <b>${fmt(s.value)}</b> aUEC</span>`);
-  $("head").innerHTML = `<div><h2>${esc(s.name)}</h2><div class="sub">${esc(s.system)}, game id ${esc(s.key)}
-     <button class="linkish" id="rename">Rename</button></div></div><div class="facts">${facts.join("")}</div>`;
-  $("rename").onclick = async () => {
-    if ($("renamebox")) { $("renamebox").remove(); return; }
-    const all = await api(`/api/places?key=${encodeURIComponent(s.key)}`);
-    const box = document.createElement("div"); box.id = "renamebox"; box.className = "howto";
-    box.innerHTML = `<p>Pick the right name from the game's own place names. The closest matches are at the top.</p>
-      <div class="field"><input id="rq" placeholder="Filter, e.g. Alpha or Gateway" autocomplete="off"></div>
-      <div class="placelist" id="rlist"></div>`;
-    $("head").after(box);
-    const draw = () => { const q = $("rq").value.trim().toLowerCase();
-      $("rlist").innerHTML = all.filter(n => !q || n.toLowerCase().includes(q)).slice(0, 60)
-        .map(n => `<button type="button" data-n="${esc(n)}">${esc(n)}</button>`).join(""); };
-    draw(); $("rq").oninput = draw; $("rq").focus();
-    $("rlist").onclick = e => { const b = e.target.closest("button"); if (!b) return;
-      post("/api/station_name", { key: s.key, name: b.dataset.n }); box.remove(); };
+    cells.push(["Last scan", `${meter(s.age_days)} ${ago(sc.last)}`, when(sc.last), s.age_days > 7 ? "warn" : ""]);
+    cells.push(["Kiosk tiles read", `${fmt(sc.identified)}${sc.total ? ` <small>of ${fmt(sc.total)}</small>` : ""}`]);
+    if (!sc.complete) warns.push(["Scan not finished.", "Open the kiosk again and press Stack to scan the whole list."]);
+    if (sc.newer_partial) warns.push(["A newer scan was started but not finished.", "These counts come from the last complete scan. Finish a full scan next time you're here."]);
+    if (sc.before_patch) warns.push(["Scanned before the current game version.", "Patches can change storage, so rescan when you're next here."]);
+    if (sc.repeat_warning) warns.push(["The kiosk listed some items twice.", "Close and reopen the kiosk, then scan again."]);
+  } else warns.push(["Not scanned yet.", "You're seeing only what the game log picked up. Open the storage kiosk here and press Stack to scan."]);
+  cells.push(["Changes since scan", fmt(s.changes || 0)]);
+  if (s.expired) cells.push(["Expired", fmt(s.expired), "", "rust"]);
+  if (s.value) cells.push(["Worth about", `${fmt(s.value)} <small>aUEC</small>`, "At the best sell prices players have reported"]);
+  if (s.untracked_changes) warns.push(["Storage changed in ways the log can't show.", "The freight elevator is the usual cause. Rescan to be sure."]);
+  $("head").innerHTML = `<div class="hmain"><div><div class="eyebrow"><span class="sysname">${esc(s.system)}</span><span>Station</span></div><h2>${esc(s.name)}</h2></div>
+      <button class="link" type="button" id="rename" aria-expanded="${!!$("renamebox")}" aria-controls="renamebox">Wrong name? Rename it</button></div>
+    ${readout(cells)}${warns.length ? `<div class="warns">${warns.map(w => notice(w[0], w[1])).join("")}</div>` : ""}`;
+  $("rename").onclick = () => openRename(s);
+}
+async function openRename(s) {
+  if ($("renamebox")) return closeRename();
+  let all;
+  try { all = await api(`/api/places?key=${encodeURIComponent(s.key)}`); }
+  catch (e) { return toast("Couldn't load the place names. " + problem(e), true); }
+  const box = document.createElement("div"); box.id = "renamebox"; box.className = "frame rename";
+  box.innerHTML = `<div class="rh"><div><h3>Rename this station</h3><p class="sub">Pick its real name from the game's own place names. The closest matches are at the top.</p></div>
+      <button class="iconbtn" type="button" id="rclose" aria-label="Close without renaming">${ICON.x}</button></div>
+    <div class="field" style="max-width:560px"><label for="rq">Filter the names</label><input id="rq" placeholder="e.g. Alpha or Gateway" autocomplete="off"></div>
+    <div class="placelist" id="rlist"></div>
+    <p class="sub" style="margin:0">Game id: <code>${esc(s.key)}</code></p>`;
+  $("head").after(box);
+  const draw = () => {
+    const q = $("rq").value.trim().toLowerCase(), hits = all.filter(n => !q || n.toLowerCase().includes(q));
+    $("rlist").innerHTML = hits.length ? hits.slice(0, 60).map(n => `<button type="button" data-n="${esc(n)}" aria-current="${n === s.name}">${esc(n)}${n === s.name ? `<span class="sub">Current name</span>` : ""}</button>`).join("")
+      + (hits.length > 60 ? `<p class="sub" style="padding:8px 12px;margin:0">Showing 60 of ${hits.length}. Type more to narrow it down.</p>` : "")
+      : `<p class="sub" style="padding:10px 12px;margin:0">No names match. Try fewer letters.</p>`;
   };
+  draw(); $("rq").oninput = draw; $("rq").focus();
+  $("rclose").onclick = closeRename;
+  if ($("rename")) $("rename").setAttribute("aria-expanded", "true");
+  $("rlist").onclick = e => { const b = e.target.closest("button"); if (!b) return; post("/api/station_name", { key: s.key, name: b.dataset.n }); closeRename(); };
+}
+function closeRename(focus = true) {
+  const b = $("renamebox"); if (!b) return;
+  b.remove(); const r = $("rename");
+  if (r) { r.setAttribute("aria-expanded", "false"); if (focus) r.focus(); }
 }
 
 /* ---------- needs you ---------- */
 function renderNeeds() {
-  const n = S.model.needs_you;
+  const n = S.model.needs_you || [];
   if (!n.length) { $("needs").innerHTML = ""; return; }
-  const stOpts = S.model.stations.map(s => `<option value="${esc(s.key)}">${esc(s.name)}</option>`).join("");
-  $("needs").innerHTML = `<div class="needs"><h3>${n.length === 1 ? "One thing needs you" : `${n.length} things need you`}</h3>` +
-    n.slice(0, 8).map((x, k) => {
+  const sel = (id, v) => (S.needSel[id] || {})[v] || "";
+  const stOpts = (id) => S.model.stations.map(s => `<option value="${esc(s.key)}" ${sel(id, "loc") === s.key ? "selected" : ""}>${esc(s.name)}</option>`).join("");
+  const shown = S.needsAll ? n : n.slice(0, 4);
+  $("needs").innerHTML = `<section class="frame needs" aria-labelledby="needs-h"><div class="needs-h"><span class="pulse" aria-hidden="true"></span>
+    <h3 id="needs-h">${n.length === 1 ? "One thing needs you" : `${n.length} things need you`}</h3><span class="sub">The game log saw these but couldn't tell where they belong.</span></div>` +
+    shown.map((x, k) => {
       let ctl = "";
-      if (x.kind === "buy") ctl = `<select data-k="${k}" class="nloc"><option value="">Pick station</option>${stOpts}</select>
-         <button class="btn" data-act="loc" data-k="${k}">Assign</button>`;
+      if (x.kind === "buy") ctl = `<label class="sr" for="nloc-${k}">Station it went to</label><select id="nloc-${k}" class="nloc" data-k="${k}"><option value="">Pick the station</option>${stOpts(x.event_id)}</select>
+         <button class="btn sm" type="button" data-act="loc" data-k="${k}">Save station</button>`;
       if (x.kind === "sell") {
         const here = S.model.items.filter(i => i.location_key === x.location_key && i.qty > 0);
-        ctl = `<select data-k="${k}" class="nitem"><option value="">Pick item</option>${here.map(i =>
-          `<option value="${esc(i.name)}">${esc(i.name)} (${fmt(i.qty)})</option>`).join("")}</select>
-          <input type="number" class="nqty" data-k="${k}" value="${x.qty}" aria-label="Quantity">
-          <button class="btn" data-act="item" data-k="${k}">Record</button>`;
+        ctl = `<label class="sr" for="nitem-${k}">Which item</label><select id="nitem-${k}" class="nitem" data-k="${k}"><option value="">Pick the item</option>${here.map(i =>
+          `<option value="${esc(i.name)}" ${sel(x.event_id, "item") === i.name ? "selected" : ""}>${esc(i.name)} (${fmt(i.qty)})</option>`).join("")}</select>
+          <label class="sr" for="nqty-${k}">How many</label><input type="number" class="inp nqty" id="nqty-${k}" data-k="${k}" value="${esc(sel(x.event_id, "qty") || x.qty)}" min="1" style="width:84px">
+          <button class="btn sm" type="button" data-act="item" data-k="${k}">Record item</button>`;
       }
-      return `<div class="need"><p>${esc(x.text)} <span class="sub">${when(x.ts)}</span></p>${ctl}
-        <button class="btn quiet" data-act="ignore" data-k="${k}">Ignore</button></div>`;
-    }).join("") + `</div>`;
-  $("needs").querySelectorAll("button[data-act]").forEach(b => b.onclick = () => {
-    const x = n[+b.dataset.k], act = b.dataset.act;
+      return `<div class="need"><p>${esc(x.text)} <span class="sub">${when(x.ts)}</span></p><div class="ctl">${ctl}
+        <button class="btn ghost sm" type="button" data-act="ignore" data-k="${k}">Ignore</button></div></div>`;
+    }).join("") + (n.length > 4 ? `<div class="more"><button class="link" type="button" id="needsmore">${S.needsAll ? "Show fewer" : `Show all ${n.length}`}</button></div>` : "") + `</section>`;
+  const box = $("needs");
+  box.querySelectorAll("select, input").forEach(el => el.onchange = () => {
+    const x = n[+el.dataset.k], v = el.classList.contains("nloc") ? "loc" : el.classList.contains("nitem") ? "item" : "qty";
+    (S.needSel[x.event_id] ||= {})[v] = el.value;
+  });
+  if ($("needsmore")) $("needsmore").onclick = () => { S.needsAll = !S.needsAll; renderNeeds(); };
+  box.querySelectorAll("button[data-act]").forEach(b => b.onclick = () => {
+    const k = b.dataset.k, x = n[+k], act = b.dataset.act;
     if (act === "ignore") return post("/api/event", { event_id: x.event_id, choice: "ignore" });
     if (act === "loc") {
-      const v = $("needs").querySelector(`.nloc[data-k="${b.dataset.k}"]`).value;
-      if (!v) return toast("Pick the station first.");
+      const v = box.querySelector(`.nloc[data-k="${k}"]`).value;
+      if (!v) { box.querySelector(`.nloc[data-k="${k}"]`).focus(); return toast("Pick the station first."); }
       return post("/api/event", { event_id: x.event_id, choice: "location", location_key: v });
     }
-    const name = $("needs").querySelector(`.nitem[data-k="${b.dataset.k}"]`).value;
-    const qty = $("needs").querySelector(`.nqty[data-k="${b.dataset.k}"]`).value;
-    if (!name) return toast("Pick the item first.");
+    const name = box.querySelector(`.nitem[data-k="${k}"]`).value;
+    const qty = box.querySelector(`.nqty[data-k="${k}"]`).value;
+    if (!name) { box.querySelector(`.nitem[data-k="${k}"]`).focus(); return toast("Pick the item first."); }
     post("/api/event", { event_id: x.event_id, choice: "item", location_key: x.location_key, name, qty });
   });
 }
 
-/* ---------- views ---------- */
-function itemRow(i) {
-  const ch = i.log_change + i.your_change;
+/* ---------- tabs ---------- */
+function renderTabs() {
+  const m = S.model, inSt = x => !S.station || x.location_key === S.station;
+  const set = (id, n) => { $(id).textContent = n ? fmt(n) : ""; };
+  set("c-items", m.items.filter(i => inSt(i) && i.qty > 0).length);
+  set("c-changes", m.changes.filter(inSt).length);
+  set("c-expired", m.items.filter(i => inSt(i) && i.expired > 0).length);
+  set("c-wish", (m.wishlist || []).filter(x => !x.done && x.need > 0).length);
+  document.querySelectorAll("#tabs [role=tab]").forEach(b => { const on = b.dataset.tab === S.tab; b.setAttribute("aria-selected", on); b.tabIndex = on ? 0 : -1; });
+  $("view").setAttribute("aria-labelledby", "tab-" + S.tab);
+  $("filters").hidden = !(S.tab === "items" || S.tab === "expired");
+}
+function setTab(t, focusTab) {
+  if (S.tab === t) return;
+  S.tab = t; render();
+  const bar = $("tabs"), top = bar.getBoundingClientRect().top + window.scrollY - 2;
+  if (window.scrollY > top) window.scrollTo(0, top);
+  if (focusTab) $("tab-" + t).focus();
+}
+
+/* ---------- items ---------- */
+function itemRow(i, k, allSt, showAlso, alt, grouped) {
+  const exp = S.tab === "expired", ch = i.log_change + i.your_change;
   const chips = [i.registered ? `<span class="chip reg">Registered</span>` : "",
-    i.your_change ? `<span class="chip edit">Edited</span>` : "",
-    i.expired && S.tab !== "expired" ? `<span class="chip exp">${i.expired} expired</span>` : "",
+    i.your_change ? `<span class="chip edit">Edited by you</span>` : "",
+    i.expired && !exp ? `<span class="chip exp">${fmt(i.expired)} expired</span>` : "",
+    !i.scanned ? `<span class="chip tag">From the log</span>` : "",
     ...(i.tags || []).map(t => `<span class="chip tag">${esc(t)}</span>`)].join("");
-  const spec = [i.size && `S${i.size}`, i.grade && `Grade ${i.grade}`, i.item_class].filter(Boolean).join(", ");
-  return `<tr data-i="${S.rows.indexOf(i)}">
-    <td><div>${esc(i.name)}</div><div class="sub">${chips}${esc(i.manufacturer || "")}</div></td>
-    <td class="num"><span class="qty">${fmt(S.tab === "expired" ? i.expired : i.qty)}</span>${ch && S.tab !== "expired" ?
-      `<span class="delta ${ch > 0 ? "up" : "down"}">${ch > 0 ? "+" : ""}${ch}</span>` : ""}</td>
-    ${S.station ? "" : `<td>${esc(i.location)}</td>`}
-    <td class="hide-sm">${esc(i.item_type || "")}<div class="sub">${esc(spec)}</div></td>
-    <td class="num hide-sm">${i.value ? fmt(i.value) : ""}</td>
-    <td class="hide-sm sub">${i.also_at.length ? esc(i.also_at.slice(0, 2).join(", ")) + (i.also_at.length > 2 ? ` +${i.also_at.length - 2}` : "") : ""}</td></tr>`;
+  const spec = [i.size && `Size ${i.size}`, i.grade && `Grade ${i.grade}`, i.item_class].filter(Boolean).join(" \u00b7 ");
+  const sel = S.open && S.open.key === i.location_key && S.open.name === i.name;
+  const also = i.also_at.length ? esc(i.also_at.slice(0, 2).join(", ")) + (i.also_at.length > 2 ? ` +${i.also_at.length - 2}` : "") : "";
+  const n = exp ? i.expired : i.qty;
+  return `<tr class="row${sel ? " sel" : ""}${alt ? " alt" : ""}" data-i="${k}">
+    <td class="c-item"><button type="button" class="iname" data-i="${k}" data-fk="${esc(`item:${i.location_key}|${i.name}`)}">${esc(i.name)}</button>
+      <div class="meta">${chips}${i.manufacturer ? `<span class="sub">${esc(i.manufacturer)}</span>` : ""}</div>
+      ${allSt && S.sort !== "station" ? `<div class="sub show-md">${esc(i.location)}</div>` : ""}
+      ${i.value ? `<div class="show-sm vsm"><b>${fmt(i.value)}</b> <small>aUEC</small></div>` : ""}</td>
+    <td class="num c-qty"><span class="qty">${fmt(n)}</span>${ch && !exp ? `<span class="delta ${ch > 0 ? "up" : "down"}" title="Change since the last scan">${signed(ch)}</span>` : ""}</td>
+    <td class="num c-val hide-sm">${i.value ? `<span class="val">${fmt(i.value)}<small> aUEC</small></span>${i.unit_sell && n > 1 ? `<span class="each">${fmt(i.unit_sell)} each</span>` : ""}` : `<span class="noval" title="No sell price reported">\u2013</span>`}</td>
+    ${allSt && S.sort !== "station" ? `<td class="hide-md c-st">${esc(i.location)}<div class="sub">${esc(i.system || "")}</div></td>` : ""}
+    <td class="hide-md">${grouped === "type" ? "" : `${esc(i.item_type || "")}`}<div class="${grouped === "type" ? "" : "sub"}">${esc(spec)}</div></td>
+    ${showAlso ? `<td class="hide-md sub">${also}</td>` : ""}</tr>`;
 }
 function renderItems() {
-  const rows = filtered();
+  const m = S.model, exp = S.tab === "expired";
+  if (!m.stations.length) {
+    $("fcount").textContent = ""; $("fclear").hidden = true;
+    $("view").innerHTML = emptyState("Nothing scanned yet", "Start the tracker with run.bat, open a storage kiosk in game and press its Stack button. Your items show up here as the tracker reads them.", `<button class="btn" type="button" data-go="tips">Read the scanning tips</button>`);
+    return;
+  }
+  const rows = filtered(), base = filtered(S.station, true).length, active = filtersActive();
   S.rows = rows;
-  if (!S.model.stations.length) {
-    $("view").innerHTML = `<p class="empty">Nothing scanned yet. Start the tracker with run.bat, open a storage kiosk in game and press its Stack button. The Tips tab has the details.</p>`;
-    return;
-  }
+  $("fcount").textContent = active ? `Showing ${fmt(rows.length)} of ${plural(base, "item")}` : plural(rows.length, "item");
+  $("fclear").hidden = !active;
+  const intro = exp ? notice("These are locked.", "The kiosk marks them as expired, so you can't take them out as normal. The count shown is the expired ones only.", "rust") : "";
   if (!rows.length) {
-    $("view").innerHTML = `<p class="empty">${S.tab === "expired" ? "No expired items here." : "No items match. Clear the search or filters to see everything."}</p>`;
+    if (!active) { $("view").innerHTML = intro + (exp ? emptyState("Nothing has expired", S.station ? "No items at this station are marked as expired." : "No items at any station are marked as expired.") : emptyState("No items here", "This station has nothing stored right now.")); return; }
+    let more = "";
+    if (S.station) { const n = filtered("").length; if (n) more = `<button class="btn" type="button" data-allst>Search all stations (${plural(n, "match", "matches")})</button>`; }
+    $("view").innerHTML = intro + emptyState("No items match", `Nothing ${S.station ? "at this station " : ""}matches your search and filters. Try fewer letters, or clear them.`, `${more}<button class="btn ghost" type="button" data-clear>Clear search and filters</button>`);
     return;
   }
-  $("view").innerHTML = `<table><thead><tr><th>Item</th><th class="num">${S.tab === "expired" ? "Expired" : "Qty"}</th>
-    ${S.station ? "" : "<th>Station</th>"}<th class="hide-sm">Type</th><th class="num hide-sm">Value</th><th class="hide-sm">Also at</th></tr></thead>
-    <tbody>${rows.map(itemRow).join("")}</tbody></table>
-    <p class="sub">${rows.length} items. Values use the best sell price UEX players have reported, so check the date in each item.</p>`;
-  $("view").querySelectorAll("tbody tr").forEach(tr => tr.onclick = () => openItem(S.rows[+tr.dataset.i]));
+  const allSt = !S.station, showAlso = m.items.some(i => i.also_at.length);
+  const grouped = S.sort === "type" ? "type" : S.sort === "station" && allSt ? "station" : "";
+  const th = (key, label, cls = "") => {
+    const on = S.sort === key, asc = SORTS[key][1] * S.dir > 0;
+    return `<th class="${cls}" ${on ? `aria-sort="${asc ? "ascending" : "descending"}"` : ""}><button type="button" data-sort="${key}">${label}${on ? `<span class="arr" aria-hidden="true">${asc ? "\u25b2" : "\u25bc"}</span>` : ""}</button></th>`;
+  };
+  const cols = 4 + (allSt && S.sort !== "station" ? 1 : 0) + (showAlso ? 1 : 0);
+  const gkey = i => grouped === "type" ? (i.item_type || "Other") : i.location;
+  let body = "", cur = null, alt = false;
+  rows.forEach((i, k) => {
+    if (grouped && gkey(i) !== cur) {
+      cur = gkey(i); alt = false;
+      const g = rows.filter(r => gkey(r) === cur), val = g.reduce((a, r) => a + (r.value || 0), 0), cnt = g.reduce((a, r) => a + (exp ? r.expired : r.qty), 0);
+      body += `<tr class="gh"><th colspan="${cols}" scope="colgroup"><div class="ghbar"><span class="ghn">${esc(cur)}</span><span class="ghm">${plural(g.length, "line")} \u00b7 ${fmt(cnt)} in storage${val ? ` \u00b7 about ${fmt(val)} aUEC` : ""}</span></div></th></tr>`;
+    }
+    body += itemRow(i, k, allSt, showAlso, alt, grouped); alt = !alt;
+  });
+  $("view").innerHTML = `${intro}<div class="frame tablewrap"><table class="items"><thead><tr>${th("name", "Item")}${th("qty", exp ? "Expired" : "Qty", "num")}${th("value", "Value", "num hide-sm")}
+    ${allSt && S.sort !== "station" ? th("station", "Station", "hide-md") : ""}${th("type", grouped === "type" ? "Size and grade" : "Type", "hide-md")}${showAlso ? `<th class="hide-md">Also at</th>` : ""}</tr></thead>
+    <tbody>${body}</tbody></table></div>
+    <div class="tfoot"><span class="sub">Click an item to record a change, add a note or see prices.</span><span class="sub">Value is the whole stack in aUEC, at the best sell price players have reported to UEX. Check the date in each item.</span></div>`;
+  document.documentElement.style.setProperty("--tabh", $("tabs").offsetHeight + "px");
 }
+
+/* ---------- changes ---------- */
 function renderChanges() {
-  const ch = S.model.changes.filter(c => !S.station || c.location_key === S.station);
-  if (!ch.length) { $("view").innerHTML = `<p class="empty">No changes since the last scan${S.station ? " here" : ""}. Items you move, buy or edit show up here.</p>`; return; }
-  $("view").innerHTML = `<ul class="changes">${ch.slice(0, 300).map(c => `<li><time>${when(c.ts)}</time>
-     <span>${c.delta > 0 ? "+" : ""}${c.delta} ${esc(c.item)} <span class="sub">${esc(c.what)}${S.station ? "" : `, ${esc(c.location)}`}</span></span>
-     <span>${c.adjustment_id ? `<button class="linkish" data-undo="${c.adjustment_id}">Undo</button>` : `<span class="sub">${c.source === "log" ? "from game log" : esc(c.source)}</span>`}</span></li>`).join("")}</ul>`;
-  $("view").querySelectorAll("[data-undo]").forEach(b => b.onclick = () => post("/api/undo", { adjustment_id: +b.dataset.undo }));
+  const ch = S.model.changes.filter(c => !S.station || c.location_key === S.station).slice().sort((a, b) => b.ts - a.ts);
+  if (!ch.length) {
+    $("view").innerHTML = emptyState(`No changes since the last scan${S.station ? " here" : ""}`, "When you store, take, buy or sell something, the game log picks it up and it shows here. Changes you record yourself show here too, with an Undo button.");
+    return;
+  }
+  const days = [];
+  for (const c of ch.slice(0, 300)) { const l = dayLabel(c.ts); if (!days.length || days[days.length - 1].l !== l) days.push({ l, list: [] }); days[days.length - 1].list.push(c); }
+  S.chRows = ch;
+  $("view").innerHTML = `<p class="intro">What's moved since each station's last scan. The next scan of a station replaces these with the kiosk's own count.</p>` +
+    days.map(d => `<div class="day"><h3>${esc(d.l)}</h3><ul class="frame chgs">${d.list.map(c => {
+      const k = ch.indexOf(c), has = S.model.items.some(i => i.location_key === c.location_key && i.name === c.item);
+      return `<li class="chg"><time datetime="${new Date(c.ts * 1000).toISOString()}">${clock(c.ts)}</time><span class="dl ${c.delta > 0 ? "up" : "down"}">${signed(c.delta)}</span>
+        <span class="what">${has ? `<button class="iname" type="button" data-chopen="${k}">${esc(c.item)}</button>` : `<b>${esc(c.item)}</b>`}<span class="sub">${esc(c.what)}${S.station ? "" : `, ${esc(c.location)}`}</span></span>
+        <span class="src">${c.adjustment_id ? `<span class="chip edit">Recorded by you</span><button class="link" type="button" data-undo="${c.adjustment_id}">Undo</button>` : `<span class="chip log">${c.source === "log" ? "Game log" : esc(c.source)}</span>`}</span></li>`;
+    }).join("")}</ul></div>`).join("") + (ch.length > 300 ? `<p class="sub">Showing the latest 300 of ${fmt(ch.length)}.</p>` : "");
 }
-async function renderTips() {
-  S.tips ||= await api("/api/tips");
-  $("view").innerHTML = `<div class="tips">${S.tips.map(t => `<h3>${esc(t.head)}</h3><ul>${t.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`).join("")}</div>`;
+
+/* ---------- tips, links, about ---------- */
+async function renderTips(tok) {
+  S.tips ||= await api("/api/tips"); if (tok !== S.viewTok) return;
+  $("view").innerHTML = `<p class="intro">How to get clean, complete scans. Worth a read before your first one.</p><div class="cards">${S.tips.map((t, k) =>
+    `<section class="frame card"><h3><span class="idx">${String(k + 1).padStart(2, "0")}</span>${esc(t.head)}</h3><ul>${t.items.map(x => `<li>${esc(x)}</li>`).join("")}</ul></section>`).join("")}</div>`;
 }
-async function renderSettings() {
-  S.settings = await api("/api/settings");
-  const s = S.settings;
-  const box = (k, label, help) => `<label><input type="checkbox" data-k="${k}" ${s[k] ? "checked" : ""}><span><b>${label}</b><br><span class="sub">${help}</span></span></label>`;
-  $("view").innerHTML = `<div class="settings">
-    <label><span><b>Shop helper</b><br><span class="sub">At a shop terminal, label the items you already own and where.</span><br>
-      <select id="shop"><option value="key">When I press Insert</option><option value="auto">Automatically (uses more CPU)</option><option value="off">Off</option></select></span></label>
-    ${box("overlay", "Show the overlay while scanning", "Dots and outlines over the kiosk tiles. Turn off if the game stutters; clicks and chimes still tell you what's recorded.")}
-    ${box("sound", "Sounds", "A click for each item, a chime when a page is done.")}
-    ${box("track_from_log", "Keep stations up to date from the game log", "Moves in and out of storage and shop purchases, between scans.")}
-    ${box("fetch_item_data", "Fetch prices and item stats", "From api.star-citizen.wiki. Only item ids are sent, nothing about you.")}
-    ${box("dashboard_with_live", "Run this dashboard while scanning", "Opens at the same address while live mode runs.")}
-    <label><span><b>Left out of summary.csv</b><br><span class="sub">Item types, separated by commas</span><br>
-      <input type="text" id="hide" value="${esc((s.summary_hide_types || []).join(", "))}"></span></label>
-    <button class="btn" id="save">Save settings</button>
-    <h3 style="margin-top:34px">Share with your org or friends</h3>
-    <p class="sub">Makes a file listing your stations and items, with no names, log ids or history. Add a label so they know whose it is.</p>
-    <div class="form"><input id="slabel" class="grow" placeholder="Label, e.g. your handle"><label><input type="checkbox" id="snotes"> Include my notes and tags</label>
-    <button class="btn quiet" id="share">Make share file</button></div>
-    <h3 style="margin-top:34px">After a wipe</h3>
-    <p class="sub">If a patch clears everyone's storage, start fresh. Earlier scans stay in the database but stop showing.</p>
-    <button class="btn quiet" id="fresh">Start fresh</button>
-    <p class="sub">Theme: <button class="linkish" data-theme="">match Windows</button> <button class="linkish" data-theme="dark">dark</button> <button class="linkish" data-theme="light">light</button></p></div>`;
+async function renderLinks(tok) {
+  S.links ||= await api("/api/links"); if (tok !== S.viewTok) return;
+  $("view").innerHTML = `<p class="intro">Community sites players use alongside the tracker. They open in your browser.</p><div class="cards">${S.links.map(g =>
+    `<section class="frame card"><h3>${esc(g.head)}</h3><ul class="linkl">${g.items.map(l =>
+      `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)} ${ICON.ext}<span class="sr">(opens in a new tab)</span></a><div class="sub">${esc(l.about)}</div></li>`).join("")}</ul></section>`).join("")}</div>
+    <p class="sub" style="margin-top:16px">Know a good one that's missing? Suggest it on the project's GitHub page.</p>`;
+}
+async function renderAbout(tok) {
+  S.about ||= await api("/api/about"); if (tok !== S.viewTok) return;
+  const a = S.about, au = a.author;
+  $("view").innerHTML = `<div class="frame about">
+    <h3>Made by ${esc(au.name)}${au.handle ? `, in game as ${esc(au.handle)}` : ""}</h3>
+    ${a.message.map((m, k) => `<p class="${k === a.message.length - 1 ? "lead" : ""}">${esc(m)}</p>`).join("")}
+    ${au.org ? `<p>Org: ${esc(au.org)}</p>` : ""}
+    ${au.repo ? `<p><a href="${esc(au.repo)}" target="_blank" rel="noopener">Project page, updates and issues ${ICON.ext}</a></p>` : ""}
+    <h3>How it treats your game and your data</h3><ul>${a.rules.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
+    <p class="sub">SC Inventory Tracker ${esc(a.version)}</p></div>`;
+}
+
+/* ---------- settings ---------- */
+async function renderSettings(tok) {
+  const s = await api("/api/settings"); if (tok !== S.viewTok) return;
+  S.settings = s;
+  const box = (k, label, help) => `<label class="opt"><input class="switch" type="checkbox" role="switch" data-k="${k}" ${s[k] ? "checked" : ""}><span><b>${label}</b><span class="sub">${help}</span></span></label>`;
+  const theme = document.documentElement.dataset.theme || "";
+  $("view").innerHTML = `<div class="setgrid">
+    <section class="frame set"><h3>While you play</h3>
+      <div class="opt" style="cursor:default"><span></span><span><label for="shop"><b>Shop helper</b></label><span class="sub">At a shop terminal, labels the items you already own and where they are.</span>
+        <select id="shop" style="margin-top:8px"><option value="key">When I press Insert</option><option value="auto">Automatically (uses more CPU)</option><option value="off">Off</option></select></span></div>
+      ${box("overlay", "Show the overlay while scanning", "Dots and outlines over the kiosk tiles. Turn it off if the game stutters. Clicks and chimes still tell you what's recorded.")}
+      ${box("sound", "Sounds", "A click for each item, a chime when a page is done.")}
+      ${box("track_from_log", "Keep stations up to date from the game log", "Picks up moves in and out of storage, and shop purchases, between scans.")}
+      ${box("fetch_item_data", "Fetch prices and item stats", "From api.star-citizen.wiki. Only item ids are sent, nothing about you.")}
+      ${box("dashboard_with_live", "Run this dashboard while scanning", "Opens at the same address while live mode runs.")}
+      <div class="opt" style="cursor:default"><span></span><span><label for="hide"><b>Left out of summary.csv</b></label><span class="sub">Item types to skip, separated by commas.</span>
+        <input class="inp" type="text" id="hide" value="${esc((s.summary_hide_types || []).join(", "))}" style="margin-top:8px;width:min(360px,100%)"></span></div>
+      <div class="savebar"><button class="btn" type="button" id="save">Save settings</button><span class="sub" id="dirty" hidden>You have changes that aren't saved yet.</span></div></section>
+    <section class="frame set"><h3>Look</h3><p class="sub">Saved on this PC only. Takes effect straight away.</p>
+      <div class="seg" role="radiogroup" aria-label="Theme">${[["", "Match Windows"], ["dark", "Dark"], ["light", "Light"]].map(([v, l]) =>
+        `<button type="button" role="radio" data-theme="${v}" aria-checked="${theme === v}" aria-pressed="${theme === v}">${l}</button>`).join("")}</div></section>
+    <section class="frame set"><h3>Share with your org or friends</h3>
+      <p class="sub">Makes a file listing your stations and items, with no names, log ids or history. Add a label so they know whose it is.</p>
+      <div class="form"><div class="field grow"><label for="slabel">Label</label><input id="slabel" placeholder="e.g. your handle"></div>
+        <label class="chipt" style="margin-bottom:2px"><input type="checkbox" id="snotes"> Include my notes and tags</label>
+        <button class="btn ghost" type="button" id="share">Make share file</button></div></section>
+    <section class="frame set"><h3>After a wipe</h3>
+      <p class="sub">If a patch clears everyone's storage, start fresh. Earlier scans stay in the database but stop showing here.</p>
+      <div class="form" style="margin-top:6px"><button class="btn ghost" type="button" id="fresh" style="color:var(--rust);border-color:var(--rust)">Start fresh</button></div></section></div>`;
   $("shop").value = s.shop_helper || "key";
-  $("save").onclick = () => {
+  $("view").querySelectorAll(".setgrid section:first-child input, .setgrid section:first-child select").forEach(el => el.addEventListener("input", () => $("dirty").hidden = false));
+  $("save").onclick = async () => {
     const b = {};
     $("view").querySelectorAll("input[data-k]").forEach(i => b[i.dataset.k] = i.checked);
     b.shop_helper = $("shop").value;
     b.summary_hide_types = $("hide").value.split(",").map(x => x.trim()).filter(Boolean);
-    post("/api/settings", b);
+    if (await post("/api/settings", b)) $("dirty") && ($("dirty").hidden = true);
   };
   $("share").onclick = () => post("/api/share", { label: $("slabel").value, notes: $("snotes").checked });
-  $("fresh").onclick = () => { if (confirm("Hide all earlier scans and changes? Do this only after a storage wipe.")) post("/api/fresh_start", {}); };
-  $("view").querySelectorAll("[data-theme]").forEach(x => x.onclick = () => setTheme(x.dataset.theme));
-}
-/* ---------- shared: item search box and "how to get it" ---------- */
-function itemSearch(el, onPick, endpoint = "/api/suggest") {
-  const box = document.createElement("div"); box.className = "sugg"; el.after(box);
-  let t = null, rows = [];
-  el.addEventListener("input", () => {
-    clearTimeout(t);
-    t = setTimeout(async () => {
-      rows = el.value.trim().length < 2 ? [] : await api(`${endpoint}?q=${encodeURIComponent(el.value.trim())}`);
-      box.innerHTML = rows.map((r, k) => `<button type="button" data-k="${k}">${esc(r.name)}
-        <span class="sub">${r.have ? `you have ${fmt(r.have)}` : (r.maker ? esc(r.maker) + (r.role ? ", " + esc(r.role) : "") : "")}</span></button>`).join("");
-      box.style.display = rows.length ? "block" : "none";
-    }, 180);
+  $("fresh").onclick = () => { if (confirm("Start fresh? Earlier scans and changes stop showing. Only do this after a patch has wiped storage.")) post("/api/fresh_start", {}); };
+  $("view").querySelectorAll("[data-theme]").forEach(x => x.onclick = () => {
+    setTheme(x.dataset.theme);
+    $("view").querySelectorAll("[data-theme]").forEach(y => { const on = y === x; y.setAttribute("aria-checked", on); y.setAttribute("aria-pressed", on); });
   });
-  box.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
-    const r = rows[+b.dataset.k]; el.value = r.name; box.style.display = "none"; onPick(r); });
-  el.addEventListener("keydown", e => { if (e.key === "Escape") box.style.display = "none"; });
-}
-function howtoHtml(h) {
-  const parts = [];
-  parts.push(h.owned && h.owned.length ? `<p><b>You have ${fmt(h.owned.reduce((a, o) => a + o.qty, 0))}</b>: ${h.owned.map(o => `${esc(o.location)} (${fmt(o.qty)})`).join(", ")}</p>`
-    : `<p><b>You don't have any stored.</b></p>`);
-  if (!h.found) { parts.push(`<p class="sub">No item data for this one yet, so there's nothing more to say about where to get it.</p>`); return parts.join(""); }
-  const spec = [h.size && `Size ${h.size}`, h.grade && `Grade ${h.grade}`, h.item_class].filter(Boolean).join(", ");
-  if (spec) parts.push(`<p class="sub">${esc(spec)}</p>`);
-  if (h.buy && h.buy.length) parts.push(`<h4>Buy it</h4><ul class="spots">${h.buy.map(b => `<li><span>${esc(b.terminal || b.place)}<br><span class="sub">${esc(b.system || "")}, reported ${esc(b.date)}</span></span><b>${fmt(b.buy)}</b></li>`).join("")}</ul>`);
-  else parts.push(`<h4>Buy it</h4><p>Not sold in any shop that players have reported to UEX.</p>`);
-  if (h.craft) {
-    const c = h.craft;
-    let t = `<h4>Craft it</h4>`;
-    t += c.default ? `<p>The blueprint is available from the start.</p>` : c.missions.length
-      ? `<p>Get the blueprint from ${c.missions.length === 1 ? "this contract" : "one of these contracts"}:</p><ul>${c.missions.map(m => `<li>${esc(m.title)}${m.chance && m.chance < 1 ? ` <span class="sub">(${Math.round(m.chance * 100)}% chance)</span>` : ` <span class="sub">(guaranteed)</span>`}</li>`).join("")}</ul>`
-      : `<p>Craftable, but the item data doesn't list where the blueprint comes from.</p>`;
-    if (c.ingredients.length) t += `<p class="sub">Needs ${c.ingredients.map(i => `${esc(i.name)}${i.scu ? ` ${i.scu} SCU` : i.qty ? ` x${i.qty}` : ""}`).join(", ")}${c.time ? `. Takes ${esc(c.time)}.` : "."}</p>`;
-    parts.push(t);
-  }
-  if (h.ships && h.ships.length) parts.push(`<h4>Comes fitted on</h4><p>${h.ships.slice(0, 12).map(esc).join(", ")}${h.ships.length > 12 ? ` and ${h.ships.length - 12} more` : ""}.</p>
-    <p class="sub">Players often get parts like this by looting or salvaging those ships, or by taking them off one they own.</p>`);
-  if (h.loot) parts.push(`<h4>Loot</h4><p>Can turn up as loot.</p>`);
-  if (h.events && h.events.length) parts.push(`<h4>Events</h4><p>${h.events.map(e => esc(e.name || e)).join(", ")}</p>`);
-  if (h.sell && h.sell.length) parts.push(`<p class="sub">Sells for up to ${fmt(h.sell[0].sell)} at ${esc(h.sell[0].terminal || h.sell[0].place)}.</p>`);
-  if (h.url) parts.push(`<p class="sub"><a href="${esc(h.url)}" target="_blank" rel="noopener">More on star-citizen.wiki</a></p>`);
-  return parts.join("");
-}
-
-/* ---------- wish list ---------- */
-async function renderWish() {
-  const w = S.model.wishlist || [];
-  const lists = [...new Set(w.map(x => x.list))];
-  let h = `<div class="wish"><div class="addone">
-      <div class="field"><label for="wq">Item</label><input id="wq" autocomplete="off" placeholder="Start typing, e.g. Blizzard or P4-AR"></div>
-      <div class="field small"><label for="wqty">How many</label><input id="wqty" type="number" min="1" value="1"></div>
-      <div class="field"><label for="wlist">List</label><input id="wlist" list="wlists" placeholder="e.g. Centaurus refit" value="${esc(lists[0] || "Wish list")}"></div>
-      <button class="btn" id="wadd" disabled>Add</button></div>
-    <div id="wpreview" class="howto" hidden></div>
-    <details class="paste"><summary>Paste a list instead</summary>
-      <textarea id="wnames" placeholder="One item per line, e.g. from Erkul:\nFR-76\n2 x Bulwark"></textarea>
-      <button class="btn quiet" id="wpaste">Add these</button></details>
-    <datalist id="wlists">${lists.map(l => `<option value="${esc(l)}">`).join("")}</datalist>`;
-  if (!w.length) h += `<p class="empty">Nothing on your wish list yet. Search for an item above to see how to get it, or set up your ships on the Ships tab and add the parts you want.</p>`;
-  for (const l of lists) {
-    const rows = w.filter(x => x.list === l);
-    const need = rows.filter(x => !x.done && x.need > 0).length;
-    h += `<h3>${esc(l)}</h3><p class="sub">${need ? `${need} still to get` : "You have everything on this list"}</p>
-      <table><thead><tr><th>Item</th><th class="num">Want</th><th class="num">Have</th><th class="hide-sm">Where you have it</th><th></th></tr></thead><tbody>` +
-      rows.map(x => `<tr class="${x.need === 0 || x.done ? "got" : ""}"><td>${esc(x.name)}${x.note ? `<div class="sub">${esc(x.note)}</div>` : ""}</td>
-        <td class="num"><input type="number" min="1" value="${x.qty}" data-wq="${x.id}" aria-label="How many you want"></td>
-        <td class="num"><span class="${x.need ? "need-n" : "have-n"}">${fmt(x.owned)}</span></td>
-        <td class="hide-sm sub">${x.where.map(p => `${esc(p.location)} (${fmt(p.qty)})`).join(", ") || "None stored"}</td>
-        <td class="actions"><button class="linkish" data-how="${x.id}">How to get it</button> <button class="linkish" data-wdel="${x.id}">Remove</button></td></tr>
-        <tr class="howrow" id="how-${x.id}" hidden><td colspan="5"><div class="howto">Looking it up...</div></td></tr>`).join("") + `</tbody></table>`;
-  }
-  $("view").innerHTML = h + `</div>`;
-  let picked = null;
-  itemSearch($("wq"), async r => {
-    picked = r; $("wadd").disabled = false;
-    const p = $("wpreview"); p.hidden = false; p.innerHTML = "Looking it up...";
-    p.innerHTML = `<h4>${esc(r.name)}</h4>` + howtoHtml(await api(`/api/howto?id=${encodeURIComponent(r.id || "")}&name=${encodeURIComponent(r.name)}`));
-  });
-  $("wq").addEventListener("input", () => { picked = null; $("wadd").disabled = true; });
-  $("wadd").onclick = () => picked && post("/api/wish_add", { name: picked.name, id: picked.id, qty: +$("wqty").value || 1, list: $("wlist").value.trim() });
-  $("wpaste").onclick = () => post("/api/wish_add", { names: $("wnames").value, list: $("wlist").value.trim() });
-  $("view").querySelectorAll("[data-wdel]").forEach(b => b.onclick = () => post("/api/wish_delete", { id: +b.dataset.wdel }));
-  $("view").querySelectorAll("[data-wq]").forEach(i => i.onchange = () => post("/api/wish_update", { id: +i.dataset.wq, qty: +i.value || 1 }));
-  $("view").querySelectorAll("[data-how]").forEach(b => b.onclick = async () => {
-    const row = $(`how-${b.dataset.how}`); row.hidden = !row.hidden;
-    if (row.hidden || row.dataset.done) return;
-    const x = w.find(x => x.id === +b.dataset.how);
-    row.querySelector(".howto").innerHTML = howtoHtml(await api(`/api/howto?id=${encodeURIComponent(x.item_id || "")}&name=${encodeURIComponent(x.name)}`));
-    row.dataset.done = 1;
-  });
-}
-
-/* ---------- ships ---------- */
-async function renderShips() {
-  const d = await api("/api/ships");
-  let h = `<div class="ships"><div class="addone">
-      <div class="field"><label for="sq">Add a ship</label><input id="sq" autocomplete="off" placeholder="${d.count ? "e.g. Constellation Mk V or Cutlass" : "Ship list still downloading..."}"></div>
-      <div class="field"><label for="snick">Nickname (optional)</label><input id="snick" placeholder="e.g. The Big Girl"></div>
-      <button class="btn" id="sadd" disabled>Add ship</button></div>`;
-  if (!d.ships.length) h += `<p class="empty">Add the ships you fly. Each one shows its parts, slot by slot, what you've fitted, and what you already have in storage. Change a part to see the options, then add what you want to your wish list.</p>`;
-  for (const s of d.ships) {
-    h += `<section class="ship" data-ship="${s.id}"><div class="shiphead"><div><h3>${esc(s.nickname || s.name)}</h3>
-      <div class="sub">${s.nickname ? esc(s.name) + ", " : ""}${esc(s.role || "")}</div></div>
-      <div><button class="linkish" data-sdel="${s.id}">Remove</button></div></div>`;
-    if (!s.groups.length) { h += `<p class="sub">Fetching this ship's parts. Check back in a moment.</p></section>`; continue; }
-    h += `<table><thead><tr><th>Part</th><th class="num">Size</th><th>Fitted</th><th class="num">In storage</th><th></th><th class="num">Want</th></tr></thead><tbody>` +
-      s.groups.map((g, k) => `<tr>
-        <td>${esc(g.label)}${g.count > 1 ? ` <span class="sub">x${g.count}</span>` : ""}</td>
-        <td class="num">${g.size ?? ""}</td>
-        <td>${esc(g.fitted.name || "Empty")} ${g.changed ? `<span class="chip edit">your fit</span>` : `<span class="chip tag">stock</span>`}</td>
-        <td class="num">${g.have ? `<span class="have-n">${fmt(g.have)}</span>` : `<span class="sub">0</span>`}</td>
-        <td class="actions"><button class="linkish" data-opt="${s.id}:${k}">Change</button>${g.changed ? ` <button class="linkish" data-stock="${s.id}:${k}">Back to stock</button>` : ""}</td>
-        <td class="num"><input type="checkbox" data-want="${s.id}:${k}" ${g.changed && !g.have ? "checked" : ""} aria-label="Add to wish list"></td></tr>
-        <tr class="optrow" id="opt-${s.id}-${k}" hidden><td colspan="6"></td></tr>`).join("") +
-      `</tbody></table><button class="btn quiet" data-swish="${s.id}">Add ticked parts to wish list</button></section>`;
-  }
-  $("view").innerHTML = h + `</div>`;
-  let pickedShip = null;
-  itemSearch($("sq"), r => { pickedShip = r; $("sadd").disabled = false; }, "/api/vehicles");
-  $("sadd").onclick = async () => { if (pickedShip && await post("/api/ship_add", { cls: pickedShip.cls, nickname: $("snick").value })) setTimeout(renderShips, 2500); };
-  const ship = id => d.ships.find(s => s.id === +id);
-  $("view").querySelectorAll("[data-sdel]").forEach(b => b.onclick = () => { if (confirm("Remove this ship?")) post("/api/ship_delete", { id: +b.dataset.sdel }).then(renderShips); });
-  $("view").querySelectorAll("[data-stock]").forEach(b => b.onclick = () => {
-    const [sid, k] = b.dataset.stock.split(":"); const g = ship(sid).groups[+k];
-    post("/api/ship_fit", { ship_id: +sid, slots: g.slots, item_id: null }).then(renderShips);
-  });
-  $("view").querySelectorAll("[data-swish]").forEach(b => b.onclick = () => {
-    const s = ship(b.dataset.swish);
-    const items = [...$("view").querySelectorAll(`[data-want^="${s.id}:"]:checked`)].map(c => {
-      const g = s.groups[+c.dataset.want.split(":")[1]];
-      return { name: g.fitted.name, id: g.fitted.id, qty: Math.max(1, g.count - g.have), note: `${g.label}, size ${g.size}` };
-    });
-    if (!items.length) return toast("Tick the parts you want first.");
-    post("/api/ship_wish", { list: s.nickname || s.name, items });
-  });
-  $("view").querySelectorAll("[data-opt]").forEach(b => b.onclick = async () => {
-    const [sid, k] = b.dataset.opt.split(":"); const s = ship(sid), g = s.groups[+k];
-    const row = $(`opt-${sid}-${k}`); row.hidden = !row.hidden; if (row.hidden) return;
-    const cell = row.firstElementChild; cell.innerHTML = `<div class="howto">Loading size ${g.size} options...</div>`;
-    const opts = await api(`/api/options?type=${encodeURIComponent(g.item_type)}&size=${g.size}`);
-    if (!opts.length) { cell.innerHTML = `<div class="howto">No size ${g.size} options in the item data yet.</div>`; return; }
-    const main = { Cooler: "coolant", PowerPlant: "power", Shield: "shield_hp" }[g.item_type];
-    opts.sort((a, b) => (b.have - a.have) || ((b.stats[main] || 0) - (a.stats[main] || 0)));
-    cell.innerHTML = `<div class="howto"><table class="cmp"><thead><tr><th>Option</th><th>Grade</th><th>Class</th>${main ? `<th class="num">Output</th>` : ""}<th class="num">IR</th><th class="num">EM</th><th class="num">Cheapest</th><th class="num">You have</th><th></th></tr></thead><tbody>` +
-      opts.map((o, j) => `<tr class="${o.id === (g.fitted.id || "").toLowerCase() ? "this" : ""}"><td>${esc(o.name)}</td><td>${esc(o.grade || "")}</td><td>${esc(o.item_class || "")}</td>
-        ${main ? `<td class="num">${fmt(o.stats[main])}</td>` : ""}<td class="num">${fmt(o.stats.ir)}</td><td class="num">${fmt(o.stats.em)}</td>
-        <td class="num">${o.cheapest ? fmt(o.cheapest) : `<span class="sub">not sold</span>`}</td><td class="num">${o.have ? `<span class="have-n">${fmt(o.have)}</span>` : ""}</td>
-        <td class="actions"><button class="linkish" data-fit="${j}">Fit this</button> <button class="linkish" data-ohow="${j}">How to get it</button></td></tr>`).join("") +
-      `</tbody></table><div class="ohow"></div><p class="sub">Stealth parts run quieter (lower IR and EM), Military ones are tougher, Competition ones push output. "Fit this" records your plan for this ship; it doesn't change the game.</p></div>`;
-    cell.querySelectorAll("[data-fit]").forEach(x => x.onclick = () => { const o = opts[+x.dataset.fit];
-      post("/api/ship_fit", { ship_id: +sid, slots: g.slots, item_id: o.id, item_name: o.name }).then(renderShips); });
-    cell.querySelectorAll("[data-ohow]").forEach(x => x.onclick = async () => { const o = opts[+x.dataset.ohow];
-      const box = cell.querySelector(".ohow"); box.innerHTML = `<h4>${esc(o.name)}</h4>Looking it up...`;
-      box.innerHTML = `<h4>${esc(o.name)}</h4>` + howtoHtml(await api(`/api/howto?id=${encodeURIComponent(o.id)}&name=${encodeURIComponent(o.name)}`)); });
-  });
-}
-async function renderLinks() {
-  S.links ||= await api("/api/links");
-  $("view").innerHTML = `<div class="tips">${S.links.map(g => `<h3>${esc(g.head)}</h3><ul class="links-list">${g.items.map(l =>
-    `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)}</a><br><span class="sub">${esc(l.about)}</span></li>`).join("")}</ul>`).join("")}
-    <p class="sub">Know a good one that's missing? Suggest it on the project's GitHub page.</p></div>`;
-}
-async function renderAbout() {
-  S.about ||= await api("/api/about");
-  const a = S.about, au = a.author;
-  $("view").innerHTML = `<div class="about tips">
-    <h3>Made by ${esc(au.name)}${au.handle ? `, in game as ${esc(au.handle)}` : ""}</h3>
-    ${a.message.map((m, k) => `<p class="${k === a.message.length - 1 ? "lead" : ""}">${esc(m)}</p>`).join("")}
-    ${au.org ? `<p>Org: ${esc(au.org)}</p>` : ""}
-    ${au.repo ? `<p><a href="${esc(au.repo)}" target="_blank" rel="noopener">Project page, updates and issues</a></p>` : ""}
-    <h3>How it treats your game and your data</h3><ul>${a.rules.map(r => `<li>${esc(r)}</li>`).join("")}</ul>
-    <p class="sub">SC Inventory Tracker ${esc(a.version)}</p></div>`;
 }
 function setTheme(t) {
   if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
   try { localStorage.setItem("theme", t); } catch (e) {}
 }
 
+/* ---------- shared: item search box and "how to get it" ---------- */
+function itemSearch(el, onPick, endpoint = "/api/suggest") {
+  const box = document.createElement("div"); box.className = "sugg"; box.id = el.id + "-list"; box.setAttribute("role", "listbox"); box.hidden = true; el.after(box);
+  el.setAttribute("role", "combobox"); el.setAttribute("aria-autocomplete", "list"); el.setAttribute("aria-expanded", "false"); el.setAttribute("aria-controls", box.id);
+  let t = null, rows = [], act = -1, seq = 0;
+  const show = (on) => { box.hidden = !on; el.setAttribute("aria-expanded", on); };
+  const draw = () => {
+    box.innerHTML = rows.map((r, k) => `<div role="option" id="${box.id}-${k}" data-k="${k}" aria-selected="${k === act}"><span>${esc(r.name)}</span>
+      <span class="sub">${r.have ? `you have ${fmt(r.have)}` : (r.maker ? esc(r.maker) + (r.role ? ", " + esc(r.role) : "") : "")}</span></div>`).join("");
+    if (act >= 0) { el.setAttribute("aria-activedescendant", `${box.id}-${act}`); const o = $(`${box.id}-${act}`); if (o) { const top = o.offsetTop, bot = top + o.offsetHeight; if (top < box.scrollTop) box.scrollTop = top; else if (bot > box.scrollTop + box.clientHeight) box.scrollTop = bot - box.clientHeight; } }
+    else el.removeAttribute("aria-activedescendant");
+    show(rows.length > 0);
+  };
+  const pick = (k) => { const r = rows[k]; if (!r) return; el.value = r.name; rows = []; act = -1; draw(); onPick(r); };
+  el.addEventListener("input", () => {
+    clearTimeout(t);
+    const q = el.value.trim();
+    if (q.length < 2) { rows = []; act = -1; draw(); return; }
+    t = setTimeout(async () => {
+      const my = ++seq; let r;
+      try { r = await api(`${endpoint}?q=${encodeURIComponent(q)}`); } catch (e) { return; }
+      if (my !== seq) return;
+      rows = r || []; act = -1; draw();
+      if (!rows.length) { box.innerHTML = `<div class="none">No matches for \u201c${esc(q)}\u201d. Try fewer letters or another part of the name.</div>`; show(true); }
+    }, 180);
+  });
+  el.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown" && rows.length) { e.preventDefault(); act = (act + 1) % rows.length; draw(); }
+    else if (e.key === "ArrowUp" && rows.length) { e.preventDefault(); act = (act - 1 + rows.length) % rows.length; draw(); }
+    else if (e.key === "Enter" && rows.length && !box.hidden) { e.preventDefault(); pick(act >= 0 ? act : 0); }
+    else if (e.key === "Escape" && !box.hidden) { e.preventDefault(); show(false); }
+  });
+  box.addEventListener("mousedown", e => e.preventDefault());
+  box.addEventListener("click", e => { const o = e.target.closest("[role=option]"); if (o) pick(+o.dataset.k); });
+  el.addEventListener("blur", () => setTimeout(() => show(false), 120));
+}
+function fetchHow(id, name) {
+  const k = `${id || ""}|${name}`;
+  if (S.howCache[k]) return Promise.resolve(S.howCache[k]);
+  return api(`/api/howto?id=${encodeURIComponent(id || "")}&name=${encodeURIComponent(name)}`).then(h => (S.howCache[k] = h));
+}
+function spotLi(s, key) {
+  const age = daysSince(s.date);
+  return `<li><span><span class="pl">${esc(s.terminal || s.place)}</span><span class="sub">${esc(s.system || "")}${s.date ? `, reported ${age != null && age > 45 ? `<span class="stale">${Math.round(age)} days ago</span>` : esc(prettyDate(s.date))}` : ""}</span></span>
+    <b>${fmt(s[key])} <small>aUEC</small></b></li>`;
+}
+let moreSeq = 0;
+function spotList(list, key) {
+  const id = "more" + (++moreSeq), top = list.slice(0, 3), rest = list.slice(3);
+  return `<ul class="spots">${top.map(s => spotLi(s, key)).join("")}</ul>${rest.length ? `<ul class="spots" id="${id}" hidden>${rest.map(s => spotLi(s, key)).join("")}</ul>
+    <button class="link" type="button" data-more="${id}" aria-expanded="false" aria-controls="${id}" style="margin-top:6px">Show ${rest.length} more</button>` : ""}`;
+}
+function bindMore(root) {
+  root.querySelectorAll("[data-more]").forEach(b => b.onclick = () => {
+    const el = $(b.dataset.more), open = el.hidden; el.hidden = !open;
+    b.setAttribute("aria-expanded", open); b.textContent = open ? "Show fewer" : `Show ${el.children.length} more`;
+  });
+}
+const route = (t, tag, body, off) => `<section class="route${off ? " off" : ""}"><h4>${t}${tag ? `<span class="rtag">${tag}</span>` : ""}</h4>${body}</section>`;
+function howtoHtml(h) {
+  const owned = h.owned || [], total = owned.reduce((a, o) => a + o.qty, 0);
+  let out = `<div class="how">` + (total
+    ? `<p class="havel"><span class="chip reg">You have ${fmt(total)}</span><span>${owned.map(o => `${esc(o.location)} (${fmt(o.qty)})`).join(", ")}</span></p>`
+    : `<p class="havel"><span class="chip tag">None stored</span><span class="sub">You don't have any in storage.</span></p>`);
+  if (!h.found) return out + `<p class="sub">There's no item data for this one yet, so the tracker can't say where to get it.</p></div>`;
+  const spec = [h.type, h.size && `Size ${h.size}`, h.grade && `Grade ${h.grade}`, h.item_class].filter(Boolean).join(" \u00b7 ");
+  if (spec) out += `<p class="sub">${esc(spec)}</p>`;
+  const R = [], buy = (h.buy || []).slice().sort((a, b) => a.buy - b.buy);
+  R.push(buy.length ? route("Buy it", `from ${fmt(buy[0].buy)} aUEC`, `<ul class="spots">${buy.slice(0, 4).map(b => spotLi(b, "buy")).join("")}</ul>${buy.length > 4 ? `<p class="sub">And ${buy.length - 4} more shops.</p>` : ""}`)
+    : route("Buy it", "", `<p class="sub">Not sold in any shop players have reported to UEX.</p>`, true));
+  if (h.craft) {
+    const c = h.craft;
+    let b = c.default ? `<p>The blueprint is available from the start.</p>` : c.missions.length
+      ? `<p>Get the blueprint from ${c.missions.length === 1 ? "this contract" : "one of these contracts"}:</p><ul class="missions">${c.missions.map(m => `<li>${m.url ? `<a href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.title)}</a>` : esc(m.title)}
+          <span class="chip ${m.chance && m.chance < 1 ? "tag" : "reg"}">${m.chance && m.chance < 1 ? `${Math.round(m.chance * 100)}% chance` : "Guaranteed"}</span></li>`).join("")}</ul>`
+      : `<p class="sub">Craftable, but the item data doesn't say where the blueprint comes from.</p>`;
+    if (c.ingredients.length) b += `<p class="sub"><b>Needs</b> ${c.ingredients.map(i => `${esc(i.name)}${i.scu ? ` ${i.scu} SCU` : i.qty ? ` x${i.qty}` : ""}`).join(", ")}</p>`;
+    if (c.time) b += `<p class="sub"><b>Takes</b> ${esc(c.time)}</p>`;
+    R.push(route("Craft it", c.default ? "Blueprint from the start" : c.missions.length ? plural(c.missions.length, "contract") : "", b));
+  } else R.push(route("Craft it", "", `<p class="sub">Not craftable, as far as the item data shows.</p>`, true));
+  if (h.ships && h.ships.length) R.push(route("Comes fitted on", plural(h.ships.length, "ship"), `<p class="shiplist">${h.ships.slice(0, 12).map(s => `<span class="chip tag">${esc(s)}</span>`).join("")}${h.ships.length > 12 ? `<span class="sub">and ${h.ships.length - 12} more</span>` : ""}</p>
+    <p class="sub">Players often get parts like this by looting or salvaging those ships, or by taking them off one they own.</p>`));
+  if (h.loot) R.push(route("Loot", "", `<p>Can turn up as loot.</p>`));
+  if (h.events && h.events.length) R.push(route("Events", "", `<p>${h.events.map(e => esc(e.name || e)).join(", ")}</p>`));
+  out += `<div class="routes">${R.join("")}</div>`;
+  const sell = (h.sell || []).slice().sort((a, b) => b.sell - a.sell);
+  if (sell.length) out += `<p class="sub">Sells for up to <b>${fmt(sell[0].sell)} aUEC</b> at ${esc(sell[0].terminal || sell[0].place)}.</p>`;
+  if (h.url) out += `<p class="sub"><a href="${esc(h.url)}" target="_blank" rel="noopener">More on star-citizen.wiki ${ICON.ext}</a></p>`;
+  return out + `</div>`;
+}
+
+/* ---------- wish list ---------- */
+function renderWish() {
+  const w = S.model.wishlist || [];
+  const lists = [...new Set(w.map(x => x.list))];
+  const listVal = S.wishList || lists[0] || "Wish list";
+  let h = `<p class="intro">Keep track of what you're after. Each item shows how many you already have stored, and how to get the rest.</p>
+    <section class="frame addcard" aria-labelledby="wadd-h"><h3 id="wadd-h">Add to wish list</h3>
+    <div class="addrow">
+      <div class="field wide"><label for="wq">Item</label><input id="wq" autocomplete="off" placeholder="Start typing, e.g. Blizzard or P4-AR"></div>
+      <div class="field"><label for="wqty">How many</label><input id="wqty" type="number" min="1" value="1" inputmode="numeric"></div>
+      <div class="field"><label for="wlist">List</label><input id="wlist" list="wlists" value="${esc(listVal)}" placeholder="e.g. Centaurus refit"></div>
+      <button class="btn" type="button" id="wadd" disabled>Add to wish list</button>
+    </div>
+    <p class="sub" id="whint">Pick from the suggestions to see how to get it before you add it.</p>
+    <div id="wpreview" class="preview" hidden></div>
+    <details class="paste"><summary>Paste a list instead</summary>
+      <p class="sub">One item per line. Put a number first for more than one, e.g. 2 x Bulwark. Lists copied from Erkul work too. They go on the list named above.</p>
+      <label class="sr" for="wnames">Items to add, one per line</label><textarea id="wnames" placeholder="FR-76&#10;2 x Bulwark"></textarea>
+      <button class="btn ghost" type="button" id="wpaste">Add these to the list</button></details>
+    <datalist id="wlists">${lists.map(l => `<option value="${esc(l)}">`).join("")}</datalist></section>`;
+  if (!w.length) h += emptyState("Your wish list is empty", "Search for an item above to see how to get it. You can also set up a ship on the Ships tab and send the parts you want here.", `<button class="btn ghost" type="button" data-go="ships">Set up a ship</button>`);
+  for (const l of lists) {
+    const rows = w.filter(x => x.list === l), got = rows.filter(x => x.done || x.need <= 0).length;
+    h += `<section class="frame wl" aria-label="${esc(l)}"><div class="wlh"><div><h3>${esc(l)}</h3><p class="sub">${got === rows.length ? "You have everything on this list" : `${got} of ${rows.length} got, ${rows.length - got} still to get`}</p></div>
+      <span class="prog" aria-hidden="true"><i style="width:${Math.round(got / rows.length * 100)}%"></i></span></div>
+      <div class="wr wrh" aria-hidden="true"><span>Item</span><span class="num">Want</span><span class="num">Have</span><span>Where you have it</span><span></span></div>` +
+      rows.map(x => {
+        const done = x.need === 0 || x.done, open = S.wishOpen[x.id];
+        return `<div class="wr${done ? " got" : ""}" id="wr-${x.id}"><div class="wn">${done ? ICON.check : ""}<span><b>${esc(x.name)}</b>${x.note ? `<span class="sub">${esc(x.note)}</span>` : ""}${!x.item_id ? `<span class="sub warnt">Not matched to a game item. Remove it and add it again from the suggestions.</span>` : ""}</span></div>
+          <div class="wq num"><label class="sr" for="wqn-${x.id}">How many ${esc(x.name)} you want</label><input class="inp" id="wqn-${x.id}" type="number" min="1" value="${x.qty}" data-wq="${x.id}"></div>
+          <div class="wh num"><span class="${x.need ? "need-n" : "have-n"}">${fmt(x.owned)}</span> <span class="sub">${x.need ? `need ${fmt(x.need)}` : "have"}</span></div>
+          <div class="sub wwhere">${x.where.map(p => `${esc(p.location)} (${fmt(p.qty)})`).join(", ") || "None stored"}</div>
+          <div class="acts"><button class="link" type="button" data-how="${x.id}" aria-expanded="${!!open}" aria-controls="how-${x.id}">${open ? "Hide how to get it" : "How to get it"}</button>
+            <button class="link danger" type="button" data-wdel="${x.id}">Remove<span class="sr"> ${esc(x.name)}</span></button></div></div>
+          <div class="howbox" id="how-${x.id}" ${open ? "" : "hidden"}>Looking it up...</div>`;
+      }).join("") + `</section>`;
+  }
+  $("view").innerHTML = h;
+  let picked = null;
+  const btn = $("wadd"), sync = () => {
+    const txt = $("wq").value.trim();
+    btn.disabled = !picked && txt.length < 2;
+    btn.textContent = picked || !txt ? "Add to wish list" : "Add as typed";
+    $("whint").textContent = picked ? "" : txt.length >= 2 ? "Pick a suggestion to see how to get it, or add it as typed." : "Pick from the suggestions to see how to get it before you add it.";
+    $("whint").hidden = !!picked;
+  };
+  itemSearch($("wq"), async r => {
+    picked = r; sync();
+    const p = $("wpreview"); p.hidden = false; p.innerHTML = `<h4>${esc(r.name)}</h4><p class="sub">Looking it up...</p>`;
+    try { const hw = await fetchHow(r.id, r.name); if (picked === r) p.innerHTML = `<h4>${esc(r.name)}</h4>` + howtoHtml(hw); }
+    catch (e) { p.innerHTML = `<h4>${esc(r.name)}</h4><p class="sub">${esc(problem(e))}</p>`; }
+  });
+  $("wq").addEventListener("input", () => { picked = null; $("wpreview").hidden = true; sync(); });
+  $("wlist").addEventListener("input", () => S.wishList = $("wlist").value.trim());
+  btn.onclick = () => {
+    const list = $("wlist").value.trim() || "Wish list", qty = Math.max(1, +$("wqty").value || 1), txt = $("wq").value.trim();
+    S.wishList = list;
+    if (picked) return post("/api/wish_add", { name: picked.name, id: picked.id, qty, list });
+    if (txt) post("/api/wish_add", { names: qty > 1 ? `${qty} x ${txt}` : txt, list });
+  };
+  $("wpaste").onclick = () => {
+    if (!$("wnames").value.trim()) { $("wnames").focus(); return toast("Paste or type at least one item first."); }
+    S.wishList = $("wlist").value.trim(); post("/api/wish_add", { names: $("wnames").value, list: $("wlist").value.trim() });
+  };
+  $("view").querySelectorAll("[data-wdel]").forEach(b => b.onclick = () => post("/api/wish_delete", { id: +b.dataset.wdel }));
+  $("view").querySelectorAll("[data-wq]").forEach(i => i.onchange = () => post("/api/wish_update", { id: +i.dataset.wq, qty: Math.max(1, +i.value || 1) }));
+  const fill = async (x) => {
+    const box = $(`how-${x.id}`);
+    try { const hw = await fetchHow(x.item_id, x.name); box.innerHTML = howtoHtml(hw); }
+    catch (e) { box.innerHTML = `<p class="sub">${esc(problem(e))}</p>`; }
+  };
+  $("view").querySelectorAll("[data-how]").forEach(b => {
+    const x = w.find(v => v.id === +b.dataset.how);
+    if (S.wishOpen[x.id]) fill(x);
+    b.onclick = () => {
+      const open = !S.wishOpen[x.id]; S.wishOpen[x.id] = open;
+      $(`how-${x.id}`).hidden = !open; b.setAttribute("aria-expanded", open); b.textContent = open ? "Hide how to get it" : "How to get it";
+      if (open) fill(x);
+    };
+  });
+}
+
+/* ---------- ships ---------- */
+const isWeapon = (g) => /weapon|missile|turret|gun|mount|bomb/i.test(`${g.item_type} ${g.type}`);
+async function renderShips(tok) {
+  const d = await api("/api/ships"); if (tok !== S.viewTok) return;
+  S.ships = d;
+  let h = `<p class="intro">Add the ships you fly to see every part slot, the stock part and what you already have in storage. Plan a better fit, then send the parts you need to your wish list. Planning here doesn't change anything in the game.</p>
+    <section class="frame addcard" aria-labelledby="sadd-h"><h3 id="sadd-h">Add a ship</h3><div class="addrow two">
+      <div class="field wide"><label for="sq">Ship</label><input id="sq" autocomplete="off" placeholder="${d.count ? "e.g. Constellation or Cutlass" : "The ship list is still downloading. Try again in a minute."}"></div>
+      <div class="field"><label for="snick">Nickname (optional)</label><input id="snick" placeholder="e.g. The Big Girl"></div>
+      <button class="btn" type="button" id="sadd" disabled>Add ship</button></div>
+      <p class="sub" id="shint">Type at least two letters of the ship's name, then pick it from the list.</p></section>`;
+  if (!d.ships.length) h += emptyState("No ships yet", "Add a ship above. You'll see each part slot, what's fitted and what's in storage. Change a part to compare the options.");
+  d.ships.forEach((s, n) => h += shipHtml(s, n));
+  $("view").innerHTML = h;
+  let pickedShip = null;
+  itemSearch($("sq"), r => { pickedShip = r; $("sadd").disabled = false; $("shint").textContent = `Ready to add ${r.name}.`; }, "/api/vehicles");
+  $("sq").addEventListener("input", () => { pickedShip = null; $("sadd").disabled = true; $("shint").textContent = "Type at least two letters of the ship's name, then pick it from the list."; });
+  $("sadd").onclick = async () => {
+    if (pickedShip && await post("/api/ship_add", { cls: pickedShip.cls, nickname: $("snick").value })) setTimeout(() => { if (S.tab === "ships") render(); }, 2500);
+  };
+  const ship = id => d.ships.find(s => s.id === +id);
+  const V = $("view");
+  V.querySelectorAll("[data-stog]").forEach(b => b.onclick = () => {
+    const open = b.getAttribute("aria-expanded") !== "true"; S.shipOpen[b.dataset.stog] = open;
+    b.setAttribute("aria-expanded", open); $(`ship-${b.dataset.stog}`).hidden = !open;
+  });
+  V.querySelectorAll("[data-sdel]").forEach(b => b.onclick = () => { const s = ship(b.dataset.sdel); if (confirm(`Remove ${s.nickname || s.name} from your ships? Its planned fit goes too.`)) post("/api/ship_delete", { id: s.id }); });
+  V.querySelectorAll("[data-stock]").forEach(b => b.onclick = () => {
+    const [sid, k] = b.dataset.stock.split(":"); const g = ship(sid).groups[+k];
+    post("/api/ship_fit", { ship_id: +sid, slots: g.slots, item_id: null });
+  });
+  V.querySelectorAll("[data-want]").forEach(c => c.onchange = () => S.want[c.dataset.want] = c.checked);
+  V.querySelectorAll("[data-swish]").forEach(b => b.onclick = () => {
+    const s = ship(b.dataset.swish);
+    const items = [...V.querySelectorAll(`[data-want^="${s.id}:"]:checked`)].map(c => {
+      const g = s.groups[+c.dataset.want.split(":")[1]];
+      return { name: g.fitted.name, id: g.fitted.id, qty: Math.max(1, g.count - g.have), note: `${g.label}, size ${g.size}` };
+    });
+    if (!items.length) return toast("Tick the Want box on the parts you want first.");
+    post("/api/ship_wish", { list: s.nickname || s.name, items });
+  });
+  V.querySelectorAll("[data-opt]").forEach(b => b.onclick = () => {
+    const key = b.dataset.opt, st = (S.opt[key] ||= { cls: "", mine: false, sale: false, sort: "best", all: false, how: null });
+    st.open = !st.open; renderShipsLocal(key, b);
+  });
+  Object.keys(S.opt).forEach(key => { if (S.opt[key].open && $(`opt-${key.replace(":", "-")}`)) drawOpts(key); });
+}
+function renderShipsLocal(key, b) {
+  const st = S.opt[key], id = `opt-${key.replace(":", "-")}`, box = $(id);
+  box.hidden = !st.open; b.setAttribute("aria-expanded", st.open); b.textContent = st.open ? "Close options" : "Change";
+  if (st.open) drawOpts(key);
+}
+function shipHtml(s, n) {
+  const open = S.shipOpen[s.id] ?? n === 0;
+  const changed = s.groups.filter(g => g.changed).length, parts = s.groups.reduce((a, g) => a + (g.count || 1), 0);
+  const cats = [["Systems", s.groups.map((g, k) => [g, k]).filter(([g]) => !isWeapon(g))], ["Weapons", s.groups.map((g, k) => [g, k]).filter(([g]) => isWeapon(g))]].filter(c => c[1].length);
+  const slot = (g, k) => {
+    const key = `${s.id}:${k}`, oo = S.opt[key] && S.opt[key].open, want = S.want[key] ?? (g.changed && !g.have);
+    return `<div class="slot${g.changed ? " mine" : ""}">
+      <div class="sp"><b>${esc(g.label)}</b>${g.count > 1 ? ` <span class="sub">x${g.count}</span>` : ""}</div>
+      <div class="ss"><span class="size" title="Size ${esc(g.size)}">S${esc(g.size ?? "?")}</span></div>
+      <div class="sf"><span class="fname">${esc(g.fitted.name || "Empty")}</span>${g.changed ? `<span class="chip edit">Your plan</span>` : `<span class="chip tag">Stock</span>`}${g.changed && g.stock ? `<span class="sub">Stock part: ${esc(g.stock.name)}</span>` : ""}</div>
+      <div class="sh num">${g.have ? `<span class="have-n">${fmt(g.have)}</span>` : `<span class="sub">0</span>`}<span class="sub sm-only"> in storage</span></div>
+      <div class="sa"><button class="btn ghost sm" type="button" data-opt="${key}" aria-expanded="${!!oo}" aria-controls="opt-${s.id}-${k}">${oo ? "Close options" : "Change"}</button>${g.changed ? `<button class="link" type="button" data-stock="${key}">Back to stock</button>` : ""}</div>
+      <label class="sw num"><input type="checkbox" data-want="${key}" ${want ? "checked" : ""}><span class="sm-only">Want</span><span class="sr"> ${esc(g.fitted.name || g.label)} on the wish list</span></label></div>
+      <div class="opts" id="opt-${s.id}-${k}" ${oo ? "" : "hidden"}></div>`;
+  };
+  return `<section class="frame ship" aria-label="${esc(s.nickname || s.name)}"><div class="shiph">
+    <button class="shiptoggle" type="button" data-stog="${s.id}" aria-expanded="${open}" aria-controls="ship-${s.id}">${ICON.chev}<span><span class="shipname">${esc(s.nickname || s.name)}</span>
+      <span class="sub">${s.nickname ? esc(s.name) + " \u00b7 " : ""}${esc(s.role || "")}</span></span></button>
+    <div class="shipmeta"><span class="sub">${s.groups.length ? `${plural(parts, "part")}${changed ? `, ${changed} changed from stock` : ", all stock"}` : ""}</span><button class="link danger" type="button" data-sdel="${s.id}">Remove ship</button></div></div>
+    <div id="ship-${s.id}" ${open ? "" : "hidden"}>
+    ${!s.groups.length ? `<p class="sub pad">Fetching this ship's parts. This takes a moment the first time.</p>` :
+      `<div class="slot slh" aria-hidden="true"><span>Part</span><span>Size</span><span>Fitted</span><span class="num">In storage</span><span></span><span class="num">Want</span></div>` +
+      cats.map(([label, list]) => `<div class="grp"><h4>${label}</h4>${list.map(([g, k]) => slot(g, k)).join("")}</div>`).join("") +
+      `<div class="shipfoot"><button class="btn ghost" type="button" data-swish="${s.id}">Add ticked parts to wish list</button><span class="sub">They go on a list called \u201c${esc(s.nickname || s.name)}\u201d.</span></div>`}
+    </div></section>`;
+}
+async function drawOpts(key) {
+  const [sid, k] = key.split(":"), s = S.ships.ships.find(x => x.id === +sid); if (!s) return;
+  const g = s.groups[+k], st = S.opt[key], cell = $(`opt-${sid}-${k}`); if (!cell || !g) return;
+  const ck = `${g.item_type}:${g.size}`;
+  if (!S.optCache[ck]) {
+    cell.innerHTML = `<p class="sub">Loading size ${esc(g.size)} options...</p>`;
+    try { S.optCache[ck] = await api(`/api/options?type=${encodeURIComponent(g.item_type)}&size=${g.size}`); }
+    catch (e) { cell.innerHTML = `<p class="sub">Couldn't load the options. ${esc(problem(e))}</p>`; return; }
+  }
+  const opts = S.optCache[ck];
+  if (!opts.length) { cell.innerHTML = `<p class="sub">There are no size ${esc(g.size)} ${esc(g.label.toLowerCase())} options in the item data yet.</p>`; return; }
+  const main = { Cooler: "coolant", PowerPlant: "power", Shield: "shield_hp" }[g.item_type];
+  const mainLabel = { coolant: "Cooling", power: "Power", shield_hp: "Shield health" }[main];
+  const fid = (g.fitted.id || "").toLowerCase(), sidd = ((g.stock && g.stock.id) || "").toLowerCase();
+  const classes = [...new Set(opts.map(o => o.item_class).filter(Boolean))].sort();
+  if (st.cls && !classes.includes(st.cls)) st.cls = "";
+  const big = (v) => v == null ? -Infinity : v, small = (v) => v == null ? Infinity : v;
+  const sorts = {
+    best: (a, b) => (b.have - a.have) || (main ? big(b.stats[main]) - big(a.stats[main]) : 0) || (a.grade || "Z").localeCompare(b.grade || "Z") || a.name.localeCompare(b.name),
+    main: (a, b) => big(b.stats[main]) - big(a.stats[main]),
+    ir: (a, b) => small(a.stats.ir) - small(b.stats.ir),
+    em: (a, b) => small(a.stats.em) - small(b.stats.em),
+    price: (a, b) => small(a.cheapest) - small(b.cheapest),
+    grade: (a, b) => (a.grade || "Z").localeCompare(b.grade || "Z") || a.name.localeCompare(b.name)
+  };
+  if (st.sort === "main" && !main) st.sort = "best";
+  const list = opts.filter(o => (!st.cls || o.item_class === st.cls) && (!st.mine || o.have > 0) && (!st.sale || o.cheapest)).sort(sorts[st.sort]);
+  const max = main ? Math.max(1, ...opts.map(o => o.stats[main] || 0)) : 1;
+  const shown = st.all ? list : list.filter((o, j) => j < 8 || o.id === fid);
+  const rows = shown.map(o => {
+    const j = opts.indexOf(o), here = o.id === fid, isStock = o.id === sidd;
+    const howOpen = st.how === o.id, hk = `${o.id}|${o.name}`;
+    return `<div class="orow${here ? " this" : ""}"><div class="on"><b>${esc(o.name)}</b><div class="meta">${here ? `<span class="chip edit">Fitted now</span>` : ""}${isStock ? `<span class="chip tag">Stock</span>` : ""}<span class="sub">${esc(o.maker || "")}</span></div></div>
+      <div><span class="sm-lbl">Grade and class</span>${esc(o.grade || "")} <span class="sub">${esc(o.item_class || "")}</span></div>
+      ${main ? `<div class="num"><span class="sm-lbl">${mainLabel}</span>${fmt(o.stats[main])}<span class="bar" aria-hidden="true"><i style="width:${Math.round((o.stats[main] || 0) / max * 100)}%"></i></span></div>` : ""}
+      <div class="num"><span class="sm-lbl">IR</span>${fmt(o.stats.ir)}</div><div class="num"><span class="sm-lbl">EM</span>${fmt(o.stats.em)}</div>
+      <div class="num"><span class="sm-lbl">Cheapest</span>${o.cheapest ? fmt(o.cheapest) : `<span class="sub">Not sold</span>`}</div>
+      <div class="num"><span class="sm-lbl">You have</span>${o.have ? `<span class="have-n">${fmt(o.have)}</span>` : `<span class="sub">0</span>`}</div>
+      <div class="acts">${here ? "" : `<button class="btn ghost sm" type="button" data-fit="${j}">Plan this fit<span class="sr"> (${esc(o.name)})</span></button>`}<button class="link" type="button" data-ohow="${j}" aria-expanded="${howOpen}">${howOpen ? "Hide how to get it" : "How to get it"}</button></div></div>
+      ${howOpen ? `<div class="ohow">${S.howCache[hk] ? `<h4 style="margin:0 0 8px">${esc(o.name)}</h4>` + howtoHtml(S.howCache[hk]) : `<p class="sub">Looking it up...</p>`}</div>` : ""}`;
+  }).join("");
+  cell.innerHTML = `<div class="opth"><h4>Size ${esc(g.size)} ${esc(g.label.toLowerCase())} options <span class="sub">${list.length === opts.length ? fmt(opts.length) : `${fmt(list.length)} of ${fmt(opts.length)}`}</span></h4>
+    <div class="optf">
+      ${classes.length > 1 ? `<div class="seg" role="group" aria-label="Show class">${["", ...classes].map(c => `<button type="button" data-ocls="${esc(c)}" aria-pressed="${st.cls === c}">${c ? esc(c) : "All"}</button>`).join("")}</div>` : ""}
+      <label class="chipt"><input type="checkbox" data-omine ${st.mine ? "checked" : ""}> In my storage</label>
+      <label class="chipt"><input type="checkbox" data-osale ${st.sale ? "checked" : ""}> Sold in shops</label>
+      <label class="sel">Sort <select data-osort>${[["best", "Best match"], ...(main ? [["main", `Most ${mainLabel.toLowerCase()}`]] : []), ["ir", "Lowest IR"], ["em", "Lowest EM"], ["price", "Cheapest"], ["grade", "Grade"]].map(([v, l]) => `<option value="${v}" ${st.sort === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+    </div></div>
+    ${list.length ? `<div class="olist${main ? " has-main" : ""}"><div class="orow ohead" aria-hidden="true"><span>Option</span><span>Grade and class</span>${main ? `<span class="num">${mainLabel}</span>` : ""}<span class="num">IR</span><span class="num">EM</span><span class="num">Cheapest</span><span class="num">You have</span><span></span></div>${rows}</div>`
+      : `<p class="sub">Nothing matches these filters. <button class="link" type="button" data-oreset>Show all options</button></p>`}
+    ${list.length > shown.length || (st.all && list.length > 8) ? `<p style="margin:10px 0 0"><button class="link" type="button" data-oall>${st.all ? "Show the top 8 only" : `Show all ${list.length} options`}</button></p>` : ""}
+    <p class="sub" style="margin:10px 0 0">Stealth parts run quieter (lower IR and EM, so you're harder to spot), Military ones are tougher, Competition ones push output. "Plan this fit" records your plan for this ship. It doesn't change the game.</p>`;
+  const redraw = () => drawOpts(key);
+  cell.querySelectorAll("[data-ocls]").forEach(b => b.onclick = () => { st.cls = b.dataset.ocls; redraw().then(() => { const x = cell.querySelector(`[data-ocls="${CSS.escape(st.cls)}"]`); if (x) x.focus(); }); });
+  const t = (sel, f) => { const el = cell.querySelector(sel); if (el) el.onchange = () => { f(el); redraw().then(() => { const x = cell.querySelector(sel); if (x) x.focus(); }); }; };
+  t("[data-omine]", el => st.mine = el.checked); t("[data-osale]", el => st.sale = el.checked); t("[data-osort]", el => st.sort = el.value);
+  const all = cell.querySelector("[data-oall]"); if (all) all.onclick = () => { st.all = !st.all; redraw().then(() => { const x = cell.querySelector("[data-oall]"); if (x) x.focus(); }); };
+  const rs = cell.querySelector("[data-oreset]"); if (rs) rs.onclick = () => { st.cls = ""; st.mine = false; st.sale = false; redraw(); };
+  cell.querySelectorAll("[data-fit]").forEach(x => x.onclick = () => { const o = opts[+x.dataset.fit]; st.open = false;
+    post("/api/ship_fit", { ship_id: +sid, slots: g.slots, item_id: o.id, item_name: o.name }); });
+  cell.querySelectorAll("[data-ohow]").forEach(x => x.onclick = async () => {
+    const o = opts[+x.dataset.ohow];
+    st.how = st.how === o.id ? null : o.id; await redraw();
+    const focusBack = () => { const y = cell.querySelector(`[data-ohow="${x.dataset.ohow}"]`); if (y) y.focus(); };
+    focusBack();
+    if (st.how === o.id && !S.howCache[`${o.id}|${o.name}`]) { try { await fetchHow(o.id, o.name); } catch (e) { toast(problem(e), true); } await redraw(); focusBack(); }
+  });
+}
+
 /* ---------- item panel ---------- */
-function openItem(i) {
-  S.open = { key: i.location_key, name: i.name };
-  const d = $("drawer");
-  const hist = S.model.changes.filter(c => c.location_key === i.location_key && c.item === i.name);
-  const parts = [i.scanned_qty != null ? `${fmt(i.scanned_qty)} at scan` : "not in last scan",
-    i.log_change ? `${i.log_change > 0 ? "+" : ""}${i.log_change} from game log` : "",
-    i.your_change ? `${i.your_change > 0 ? "+" : ""}${i.your_change} by you` : ""].filter(Boolean).join(", ");
+function drawerHtml(i) {
+  const hist = S.model.changes.filter(c => c.location_key === i.location_key && c.item === i.name).slice().sort((a, b) => b.ts - a.ts);
+  const parts = [i.scanned_qty != null ? `${fmt(i.scanned_qty)} at the last scan` : "Not in the last scan",
+    i.log_change ? `${signed(i.log_change)} from the game log` : "",
+    i.your_change ? `${signed(i.your_change)} recorded by you` : ""].filter(Boolean).join(", ");
+  const spec = [i.item_type, i.size && `Size ${i.size}`, i.grade && `Grade ${i.grade}`, i.item_class].filter(Boolean).join(" \u00b7 ");
   const det = [["Type", i.item_type], ["Maker", i.manufacturer], ["Size", i.size], ["Grade", i.grade], ["Class", i.item_class],
     ["Registered to you", i.registered ? fmt(i.registered) : ""], ["Expired", i.expired ? fmt(i.expired) : ""],
-    ["Tiles in kiosk", i.tiles || ""], ["Craftable", i.craftable ? "Yes" : ""], ["Item id", i.id]].filter(x => x[1]);
+    ["Tiles in kiosk", i.tiles || ""], ["Craftable", i.craftable ? "Yes" : ""], ["Item id", i.id ? `<code>${esc(i.id)}</code>` : ""]].filter(x => x[1]);
   const stats = i.stats ? Object.entries({ coolant: "Coolant output", power: "Power output", power_use: "Power draw",
     ir: "IR signature", em: "EM signature", health: "Health", shield_hp: "Shield health", mass: "Mass" })
     .filter(([k]) => i.stats[k] != null).map(([k, l]) => [l, fmt(i.stats[k])]) : [];
-  const spot = (s, key) => `<li><span>${esc(s.terminal || s.place)}<br><span class="sub">${esc(s.system || "")}, reported ${esc(s.date)}</span></span><b>${fmt(s[key])}</b></li>`;
+  const sell = (i.sell_spots || []).slice().sort((a, b) => b.sell - a.sell), buy = (i.buy_spots || []).slice().sort((a, b) => a.buy - b.buy);
   let cmp = "";
   if (i.compare && i.compare.rows.length) {
-    cmp = `<h3>Other size ${esc(i.size)} ${esc((i.wiki_type || "").toLowerCase())}s</h3>
-      <table class="cmp"><thead><tr><th>Name</th><th>Grade</th><th>Class</th><th class="num">${esc(i.compare.label)}</th><th class="num">IR</th><th class="num">Cheapest</th></tr></thead><tbody>
-      ${i.compare.rows.map(r => `<tr class="${r.this ? "this" : ""}"><td>${esc(r.name)}${r.this ? " (yours)" : ""}</td><td>${esc(r.grade)}</td><td>${esc(r.item_class)}</td>
-        <td class="num">${fmt(r.main)}</td><td class="num">${fmt(r.ir)}</td><td class="num">${r.cheapest ? fmt(r.cheapest) : ""}</td></tr>`).join("")}</tbody></table>
-      <p class="sub">Higher output isn't always better: Stealth parts run quieter (lower IR and EM), Military ones are tougher, Competition ones push output. Pick for the job.</p>`;
+    const rows = i.compare.rows, max = Math.max(1, ...rows.map(r => r.main || 0));
+    const top = rows.filter((r, k) => k < 8 || r.this), rest = rows.filter(r => !top.includes(r)), id = "cmpmore";
+    const tr = r => `<tr class="${r.this ? "this" : ""}"><td>${esc(r.name)}${r.this ? " (this one)" : ""}</td><td>${esc(r.grade)}</td><td>${esc(r.item_class)}</td>
+      <td class="num">${fmt(r.main)}<span class="bar" aria-hidden="true"><i style="width:${Math.round((r.main || 0) / max * 100)}%"></i></span></td><td class="num">${fmt(r.ir)}</td><td class="num">${r.cheapest ? fmt(r.cheapest) : ""}</td></tr>`;
+    cmp = `<div class="blk"><h3>Other size ${esc(i.size)} ${esc((i.item_type || "part").toLowerCase())}s <span>${rows.length} in total</span></h3>
+      <div class="tscroll"><table class="cmp"><thead><tr><th>Name</th><th>Grade</th><th>Class</th><th class="num">${esc(i.compare.label)}</th><th class="num">IR</th><th class="num">Cheapest</th></tr></thead>
+      <tbody>${top.map(tr).join("")}</tbody>${rest.length ? `<tbody id="${id}" hidden>${rest.map(tr).join("")}</tbody>` : ""}</table></div>
+      ${rest.length ? `<button class="link" type="button" data-more="${id}" aria-expanded="false" aria-controls="${id}" style="margin-top:8px">Show ${rest.length} more</button>` : ""}
+      <p class="sub">Higher output isn't always better. Stealth parts run quieter (lower IR and EM), Military ones are tougher, Competition ones push output. Pick for the job.</p></div>`;
   }
-  d.innerHTML = `<button class="close" aria-label="Close">&times;</button>
-    <h2>${esc(i.name)}</h2><div class="sub">${esc(i.location)}, ${esc(i.system)}</div>
-    <div class="bigqty"><b>${fmt(i.qty)}</b><span class="sub">${esc(parts)}</span></div>
-    ${i.also_at.length ? `<p class="sub">Also at ${esc(i.also_at.join(", "))}</p>` : ""}
-    <h3>Record a change</h3>
-    <div class="form"><input type="number" id="adq" step="1" placeholder="-40" aria-label="Change">
-      <input class="grow" id="adn" placeholder="What happened, e.g. sold at Levski" aria-label="Note">
-      <button class="btn" id="adgo">Record change</button></div>
-    <p class="sub">A minus number for items gone, plus for items added. The next scan of this station replaces it.</p>
-    <h3>Your note and tags</h3>
-    <div class="form"><textarea id="nt" placeholder="e.g. keep for the Centaurus refit">${esc(i.note)}</textarea>
-      <input class="grow" id="tg" placeholder="Tags, separated by commas: keep, sell, mission" value="${esc((i.tags || []).join(", "))}">
-      <button class="btn quiet" id="ntgo">Save note</button></div>
-    ${det.length ? `<h3>Details</h3><dl class="grid">${det.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join("")}</dl>` : ""}
-    ${stats.length ? `<h3>Stats</h3><dl class="grid">${stats.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>` : ""}
-    ${i.sell_spots && i.sell_spots.length ? `<h3>Best places to sell (per item)</h3><ul class="spots">${i.sell_spots.map(s => spot(s, "sell")).join("")}</ul>` : ""}
-    ${i.buy_spots && i.buy_spots.length ? `<h3>Cheapest places to buy</h3><ul class="spots">${i.buy_spots.map(s => spot(s, "buy")).join("")}</ul>` : ""}
-    ${cmp}
-    ${hist.length ? `<h3>Changes since the scan</h3><ul class="hist">${hist.map(c => `<li><span>${when(c.ts)}: ${c.delta > 0 ? "+" : ""}${c.delta}, ${esc(c.what)}</span>
-       ${c.adjustment_id ? `<button class="linkish" data-undo="${c.adjustment_id}">Undo</button>` : ""}</li>`).join("")}</ul>` : ""}
-    ${i.wiki_url ? `<p class="sub"><a href="${esc(i.wiki_url)}" target="_blank" rel="noopener">More on star-citizen.wiki</a></p>` : ""}`;
-  d.classList.add("open"); d.setAttribute("aria-hidden", "false");
-  d.querySelector(".close").onclick = closeItem;
-  $("adgo").onclick = async () => {
-    const q = parseInt($("adq").value, 10);
-    if (!q) return toast("Enter a change, e.g. -40 or 3.");
+  const also = i.also_at.map(n => `<button class="link" type="button" data-also="${esc(n)}">${esc(n)}</button>`).join(", ");
+  return `<div class="dh"><div class="eyebrow">${esc(spec || "Item")}</div><h2 id="dtitle" tabindex="-1">${esc(i.name)}</h2>
+      <div class="sub">${esc(i.location)}${i.system ? `, ${esc(i.system)}` : ""}</div>
+      <button class="iconbtn close" type="button" id="dclose" aria-label="Close item panel" title="Close (Esc)">${ICON.x}</button></div>
+    <div class="db">
+      <div class="blk"><div class="big"><b>${fmt(i.qty)}</b><span>here now</span></div>
+        <p class="sub">${esc(parts)}</p>
+        ${i.registered || i.expired || i.tags.length ? `<div class="meta">${i.registered ? `<span class="chip reg">${fmt(i.registered)} registered to you</span>` : ""}${i.expired ? `<span class="chip exp">${fmt(i.expired)} expired</span>` : ""}${(i.tags || []).map(t => `<span class="chip tag">${esc(t)}</span>`).join("")}</div>` : ""}
+        ${i.value ? `<p>Worth about <b>${fmt(i.value)} aUEC</b>${i.unit_sell ? ` <span class="sub">(${fmt(i.unit_sell)} each, best reported price)</span>` : ""}</p>` : ""}
+        ${also ? `<p class="sub">Also at ${also}</p>` : ""}</div>
+      <div class="blk"><h3>Record a change</h3>
+        <div class="seg" role="group" aria-label="What happened"><button type="button" data-dir="-1" aria-pressed="true">Took out or sold</button><button type="button" data-dir="1" aria-pressed="false">Put in or found</button></div>
+        <div class="form"><div class="field n"><label for="adq">How many</label><input type="number" id="adq" min="1" step="1" inputmode="numeric" placeholder="40"></div>
+          <div class="field grow"><label for="adn">What happened (optional)</label><input id="adn" placeholder="e.g. sold at Levski"></div>
+          <button class="btn" type="button" id="adgo">Record change</button></div>
+        <p class="sub" id="adprev">The next scan of this station replaces it with the kiosk's own count.</p></div>
+      ${hist.length ? `<div class="blk"><h3>Changes since the scan</h3><ul class="hist">${hist.map(c => `<li><span>${when(c.ts)}: <b class="${c.delta > 0 ? "have-n" : ""}" style="${c.delta < 0 ? "color:var(--rust)" : ""}">${signed(c.delta)}</b>, ${esc(c.what)}</span>
+         ${c.adjustment_id ? `<button class="link" type="button" data-undo="${c.adjustment_id}">Undo</button>` : `<span class="chip log">Game log</span>`}</li>`).join("")}</ul></div>` : ""}
+      ${sell.length ? `<div class="blk"><h3>Best places to sell <span>price each</span></h3>${spotList(sell, "sell")}</div>` : ""}
+      ${buy.length ? `<div class="blk"><h3>Cheapest places to buy <span>price each</span></h3>${spotList(buy, "buy")}</div>` : ""}
+      <div class="blk"><h3>Your note and tags</h3><p class="sub" style="margin:0">Shared by every stack of this item, at every station.</p>
+        <div class="form"><div class="field" style="flex:1 1 100%"><label for="nt">Note</label><textarea id="nt" placeholder="e.g. keep for the Centaurus refit">${esc(i.note)}</textarea></div>
+          <div class="field grow"><label for="tg">Tags, separated by commas</label><input id="tg" placeholder="keep, sell, mission" value="${esc((i.tags || []).join(", "))}"></div>
+          <button class="btn ghost" type="button" id="ntgo">Save note and tags</button></div></div>
+      ${stats.length ? `<div class="blk"><h3>Stats</h3><dl class="kv">${stats.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl></div>` : ""}
+      ${cmp}
+      ${det.length ? `<details class="blk det"><summary>More details</summary><dl class="kv">${det.map(([k, v]) => `<dt>${k}</dt><dd>${k === "Item id" ? v : esc(v)}</dd>`).join("")}</dl></details>` : ""}
+      ${i.wiki_url ? `<div class="blk"><a href="${esc(i.wiki_url)}" target="_blank" rel="noopener">More on star-citizen.wiki ${ICON.ext}</a></div>` : ""}
+    </div>`;
+}
+function openItem(i, fk, quiet) {
+  if (!i) return;
+  S.open = { key: i.location_key, name: i.name };
+  if (fk) S.opener = fk;
+  const d = $("drawer"), keep = d.scrollTop;
+  d.innerHTML = drawerHtml(i);
+  d.classList.add("open"); d.removeAttribute("inert");
+  $("shell").classList.add("has-panel"); updateModal();
+  document.querySelectorAll("#view tr.row").forEach(tr => { const r = S.rows[+tr.dataset.i]; tr.classList.toggle("sel", !!r && r.location_key === i.location_key && r.name === i.name); });
+  $("dclose").onclick = () => closeItem();
+  let dir = -1;
+  const def = "The next scan of this station replaces it with the kiosk's own count.";
+  const delta = () => { const raw = $("adq").value.trim(), n = parseInt(raw, 10); if (!n) return 0; return /^[+-]/.test(raw) ? n : dir * Math.abs(n); };
+  const prev = () => {
+    const dl = delta(), p = $("adprev");
+    if (!dl) { p.textContent = def; return; }
+    const nt = i.qty + dl;
+    p.innerHTML = nt < 0 ? `<span class="warnt">That's more than the ${fmt(i.qty)} recorded here.</span> Check the number, or rescan this station.` : `New total here: <b>${fmt(nt)}</b>. ${def}`;
+  };
+  d.querySelectorAll("[data-dir]").forEach(b => b.onclick = () => { dir = +b.dataset.dir; d.querySelectorAll("[data-dir]").forEach(x => x.setAttribute("aria-pressed", x === b)); prev(); });
+  $("adq").oninput = prev;
+  const go = async () => {
+    const q = delta();
+    if (!q) { $("adq").focus(); return toast("Enter how many, e.g. 40."); }
     if (await post("/api/adjust", { location_key: i.location_key, name: i.name, id: i.id, delta: q, note: $("adn").value })) reopen();
   };
+  $("adgo").onclick = go;
+  [$("adq"), $("adn")].forEach(el => el.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); go(); } });
   $("ntgo").onclick = async () => {
-    if (await post("/api/note", { name: i.name, note: $("nt").value, tags: $("tg").value.split(",") })) reopen();
+    if (await post("/api/note", { name: i.name, note: $("nt").value, tags: $("tg").value.split(",").map(t => t.trim()).filter(Boolean) })) reopen();
   };
   d.querySelectorAll("[data-undo]").forEach(b => b.onclick = async () => { if (await post("/api/undo", { adjustment_id: +b.dataset.undo })) reopen(); });
-  d.querySelector(".close").focus();
+  d.querySelectorAll("[data-also]").forEach(b => b.onclick = () => {
+    const st = S.model.stations.find(s => s.name === b.dataset.also); if (!st) return;
+    const it = S.model.items.find(x => x.location_key === st.key && x.name === i.name);
+    S.station = st.key; closeRename(false); render(); if (it) openItem(it, `item:${it.location_key}|${it.name}`);
+  });
+  bindMore(d);
+  if (quiet) d.scrollTop = keep; else { d.scrollTop = 0; $("dtitle").focus(); }
 }
 function reopen() {
   if (!S.open) return;
   const i = S.model.items.find(x => x.location_key === S.open.key && x.name === S.open.name);
   if (i) openItem(i); else closeItem();
 }
-function closeItem() { S.open = null; const d = $("drawer"); d.classList.remove("open"); d.setAttribute("aria-hidden", "true"); }
+function refreshOpen() {
+  const i = S.model.items.find(x => x.location_key === S.open.key && x.name === S.open.name);
+  if (i) openItem(i, null, true);
+}
+function closeItem(focus = true) {
+  if (!S.open) return;
+  S.open = null;
+  const d = $("drawer"); d.classList.remove("open"); d.setAttribute("inert", "");
+  $("shell").classList.remove("has-panel"); updateModal();
+  document.querySelectorAll("#view tr.row.sel").forEach(tr => tr.classList.remove("sel"));
+  if (focus && S.opener) { const el = document.querySelector(`[data-fk="${CSS.escape(S.opener)}"]`); if (el) el.focus(); }
+}
+function updateModal() {
+  const overlay = !!S.open && !dockMQ.matches, d = $("drawer");
+  document.querySelector(".rail").inert = overlay; $("main").inert = overlay;
+  $("scrim").classList.toggle("show", overlay);
+  if (overlay) { d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true"); }
+  else { d.setAttribute("role", "complementary"); d.removeAttribute("aria-modal"); }
+}
 
 /* ---------- wiring ---------- */
-function render() {
+function render(auto) {
   if (!S.model) return;
-  renderRail(); fillTypes(); renderHead(); renderNeeds();
-  document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === S.tab));
-  if (S.tab === "items" || S.tab === "expired") renderItems();
-  else if (S.tab === "changes") renderChanges();
-  else if (S.tab === "tips") renderTips();
-  else if (S.tab === "wish" && !S.editing) renderWish();
-  else if (S.tab === "ships" && !S.editing) renderShips();
-  else if (S.tab === "links") renderLinks();
-  else if (S.tab === "about") renderAbout();
-  else if (S.tab === "settings" && !S.editing) renderSettings();
+  const ae = document.activeElement, fk = ae && ae.dataset ? ae.dataset.fk : null;
+  renderRail(); fillTypes(); renderHead(); renderNeeds(); renderTabs();
+  const t = S.tab;
+  if (!(auto && ["wish", "ships", "settings", "tips", "links", "about"].includes(t))) {
+    const tok = ++S.viewTok;
+    const fail = e => { if (tok === S.viewTok) $("view").innerHTML = emptyState("Couldn't load this tab", `${esc(problem(e))}`, `<button class="btn ghost" type="button" data-retry>Try again</button>`); };
+    try {
+      if (t === "items" || t === "expired") renderItems();
+      else if (t === "changes") renderChanges();
+      else if (t === "wish") renderWish();
+      else {
+        const f = { tips: renderTips, ships: renderShips, links: renderLinks, about: renderAbout, settings: renderSettings }[t];
+        if (f) f(tok).catch(fail);
+      }
+    } catch (e) { fail(e); }
+  }
+  if (fk) { const el = document.querySelector(`[data-fk="${CSS.escape(fk)}"]`); if (el && el !== document.activeElement) el.focus({ preventScroll: true }); }
 }
-$("rail").addEventListener("click", e => { const b = e.target.closest(".st"); if (b) { S.station = b.dataset.st; closeItem(); render(); } });
-$("tabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { S.tab = b.dataset.tab; render(); } });
-["q", "ftype", "fsort", "fchanged", "freg", "fspread", "fammo"].forEach(id => $(id).addEventListener("input", () => { if (S.tab !== "items" && S.tab !== "expired") S.tab = "items"; render(); }));
+$("rail").addEventListener("click", e => {
+  const b = e.target.closest(".st"); if (!b) return;
+  S.station = b.dataset.st; closeRename(false); closeItem(false); render();
+});
+$("tabs").addEventListener("click", e => { const b = e.target.closest("[role=tab]"); if (b) setTab(b.dataset.tab); });
+$("tabs").addEventListener("keydown", e => {
+  const tabs = [...$("tabs").querySelectorAll("[role=tab]")], i = tabs.indexOf(document.activeElement); if (i < 0) return;
+  const n = { ArrowRight: (i + 1) % tabs.length, ArrowLeft: (i - 1 + tabs.length) % tabs.length, Home: 0, End: tabs.length - 1 }[e.key];
+  if (n != null) { e.preventDefault(); setTab(tabs[n].dataset.tab, true); tabs[n].focus(); }
+});
+$("view").addEventListener("click", e => {
+  const g = e.target.closest("[data-go]"); if (g) return setTab(g.dataset.go);
+  if (e.target.closest("[data-retry]")) return render();
+  if (e.target.closest("[data-clear]")) { clearFilters(); $("q").focus(); return; }
+  if (e.target.closest("[data-allst]")) { S.station = ""; render(); return; }
+  const so = e.target.closest("[data-sort]");
+  if (so) { const k = so.dataset.sort; if (S.sort === k) S.dir *= -1; else { S.sort = k; S.dir = 1; } $("fsort").value = k; render(); const b = $("view").querySelector(`[data-sort="${k}"]`); if (b) b.focus(); return; }
+  const un = e.target.closest("[data-undo]"); if (un) return post("/api/undo", { adjustment_id: +un.dataset.undo });
+  const co = e.target.closest("[data-chopen]");
+  if (co) { const c = S.chRows[+co.dataset.chopen], it = S.model.items.find(i => i.location_key === c.location_key && i.name === c.item); if (it) { co.dataset.fk = `chg:${co.dataset.chopen}`; openItem(it, co.dataset.fk); } return; }
+  const row = e.target.closest("tr.row");
+  if (row && (!e.target.closest("button, a, input") || e.target.closest(".iname"))) { const it = S.rows[+row.dataset.i]; openItem(it, `item:${it.location_key}|${it.name}`); }
+});
+["ftype", "fchanged", "freg", "fspread", "fammo"].forEach(id => $(id).addEventListener("input", () => render()));
+$("fsort").addEventListener("input", () => { S.sort = $("fsort").value; S.dir = 1; render(); });
+$("fclear").onclick = () => { clearFilters(); $("q").focus(); };
+$("q").addEventListener("input", () => { $("qclear").hidden = !$("q").value; if (S.tab !== "items" && S.tab !== "expired") S.tab = "items"; render(); });
+$("q").addEventListener("keydown", e => { if (e.key === "Enter") { const b = $("view").querySelector(".iname"); if (b && S.rows.length === 1) b.click(); } });
+$("qclear").onclick = () => { $("q").value = ""; $("qclear").hidden = true; render(); $("q").focus(); };
+$("scrim").onclick = () => closeItem();
+dockMQ.addEventListener("change", updateModal);
 document.addEventListener("keydown", e => {
-  if (e.key === "Escape") closeItem();
-  if (e.key === "/" && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") { e.preventDefault(); $("q").focus(); }
+  if (e.key === "Escape" && !e.defaultPrevented) {
+    const rb = $("renamebox");
+    if (rb && rb.contains(document.activeElement)) return closeRename();
+    if (S.open) return closeItem();
+    if (rb) return closeRename();
+    if (document.activeElement === $("q") && $("q").value) { $("q").value = ""; $("qclear").hidden = true; render(); }
+  }
+  if (e.key === "Tab" && S.open && !dockMQ.matches) {
+    const f = [...$("drawer").querySelectorAll("button, a[href], input, textarea, select, summary, [tabindex='0']")].filter(x => !x.disabled && x.offsetParent !== null);
+    if (f.length) { const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } }
+  }
+  if (e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey && !isTyping()) { e.preventDefault(); if (S.open && !dockMQ.matches) closeItem(false); $("q").focus(); $("q").select(); }
 });
 document.addEventListener("focusin", e => { S.editing = /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) && e.target.id !== "q"; });
-try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+document.addEventListener("focusout", () => setTimeout(() => { if (!isTyping()) S.editing = false; }, 0));
+if ($("ver").textContent.startsWith("__")) api("/api/about").then(a => { S.about = a; $("ver").textContent = a.version; }).catch(() => $("ver").textContent = "");
 load();
-setInterval(() => { if (!S.editing && !document.hidden && !["settings", "wish", "ships"].includes(S.tab)) load(); }, 15000);
+setInterval(() => { if (!S.editing && !document.hidden) load(true); }, 15000);
 </script>
 </body>
 </html>
