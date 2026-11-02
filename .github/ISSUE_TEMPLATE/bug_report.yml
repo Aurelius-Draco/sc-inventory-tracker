@@ -1,0 +1,63 @@
+name: Something isn't working
+description: Scans, names, counts or the dashboard going wrong in SC Inventory Tracker
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time. This page is public, so please don't paste raw Game.log lines, your handle or anyone else's.
+        Is the problem in Star Citizen itself rather than the tracker? Check [known issues](https://verseshards.com/issues) or report it on the [Issue Council](https://issue-council.robertsspaceindustries.com).
+  - type: input
+    id: app-version
+    attributes:
+      label: Tracker version
+      description: Shown at the top of the dashboard, under "Storage manifest" (for example 3.0).
+      placeholder: "3.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      description: Windows 10 or 11, and the version if you know it (Settings, System, About).
+      placeholder: "Windows 11 24H2"
+    validations:
+      required: true
+  - type: input
+    id: setup
+    attributes:
+      label: Screen size, display scaling and game version
+      description: Helps with scan problems. Say if you have StarStrings or another language pack installed.
+      placeholder: "2560x1440, 125%, 4.10.2, no language pack"
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should have happened
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to make it happen again
+      description: As best you can. If you can't make it happen again, say so.
+      placeholder: |
+        1. Opened the storage kiosk and pressed Stack
+        2. Hovered the first page
+        3. ...
+  - type: textarea
+    id: log
+    attributes:
+      label: tracker.log (optional)
+      description: |
+        The tracker's own log is `data\tracker.log` in the tracker's folder. Drag the file in here if you're happy to share it.
+        Open it first and check for anything personal, such as your Windows user name in folder paths, and take it out.
+  - type: markdown
+    attributes:
+      value: |
+        **Screenshots:** a cropped screenshot of the kiosk helps a lot. Crop out the in-game QR code and any chat or other players' handles before you attach it. Please don't post them uncropped.
