@@ -9,6 +9,11 @@ sell them, and keep wish lists for ship builds and loot.
 
 It runs on your PC only and never touches the game itself.
 
+By Aurelius_Draco, the maker of [Verse Shards](https://verseshards.com). Also
+by me: [Verse Shards for PC](https://github.com/Aurelius-Draco/sc-shard-status),
+which tells you how healthy your shard is and what's gone wrong when something
+breaks.
+
 ## What it does
 
 - **Reads the storage kiosk as you hover.** Rest the mouse on each item and the
